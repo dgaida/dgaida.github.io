@@ -1,22 +1,22 @@
 {
   "basics": {
-    "name": "Your Sidebar Name",
+    "name": "Daniel Gaida",
     "email": "none@example.org",
     "phone": "",
-    "website": "https://academicpages.github.io",
-    "summary": "Currently employed at Red Brick University. Short biography for the left-hand sidebar",
+    "website": "https://dgaida.github.io",
+    "summary": "Currently employed at TH Köln. Short biography for the left-hand sidebar",
     "location": {
       "address": "",
-      "postalCode": "",
-      "city": "Earth",
-      "countryCode": "US",
+      "postalCode": "51643",
+      "city": "Gummersbach",
+      "countryCode": "DE",
       "region": ""
     },
     "profiles": [
       {
         "network": "Google Scholar",
         "username": "",
-        "url": "https://scholar.google.com/citations?user=PS_CX0AAAAAJ"
+        "url": "https://scholar.google.de/citations?user=vJNZo7AAAAAJ"
       },
       {
         "network": "ORCID",
@@ -25,19 +25,19 @@
       },
       {
         "network": "GitHub",
-        "username": "academicpages",
-        "url": "https://github.com/academicpages"
+        "username": "dgaida",
+        "url": "https://github.com/dgaida"
       }
     ]
   },
   "work": [],
   "education": [
     {
-      "institution": "GitHub University",
-      "area": "Ph.D in Version Control Theory",
+      "institution": "Leiden University",
+      "area": "Ph.D in Computer Science",
       "studyType": "",
       "startDate": "",
-      "endDate": "2018",
+      "endDate": "2014",
       "gpa": null,
       "courses": []
     },
@@ -126,9 +126,9 @@
   ],
   "teaching": [
     {
-      "course": "Teaching experience 1",
-      "institution": "University 1, Department",
-      "date": "2014-01-01",
+      "course": "Künstliche Intelligenz",
+      "institution": "TH Köln, Computer Science",
+      "date": "2021-10-01",
       "role": "Undergraduate course",
       "description": ""
     },
