@@ -12,7 +12,7 @@ site_theme               : "default"
 title                    : "Daniel Gaida"
 title_separator          : "-"
 name                     : &name "Daniel Gaida"
-description              : &description "Professor für Künstliche Intelligenz an der TH Köln"
+description              : &description "Professor für Cyber-Physische Systeme an der TH Köln"
 url                      : https://dgaida.github.io
 baseurl                  : ""
 repository               : "dgaida/dgaida.github.io"
@@ -23,7 +23,7 @@ author:
   avatar           : "profile.png"
   name             : "Daniel Gaida"
   pronouns         :
-  bio              : "Professor für Künstliche Intelligenz an der TH Köln"
+  bio              : "Professor für Cyber-Physische Systeme an der TH Köln"
   location         : "Gummersbach, Germany"
   employer         : "TH Köln"
   uri              : "https://www.th-koeln.de/personen/daniel.gaida/"
