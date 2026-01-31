@@ -1,14 +1,14 @@
 {
   "basics": {
     "name": "Daniel Gaida",
-    "email": "none@example.org",
+    "email": "daniel.gaida@th-koeln.de",
     "phone": "",
     "website": "https://dgaida.github.io",
-    "summary": "Currently employed at TH Köln. Short biography for the left-hand sidebar",
+    "summary": "Currently employed at TH K\u00f6ln. Professor f\u00fcr Cyber-Physische Systeme an der TH K\u00f6ln",
     "location": {
       "address": "",
-      "postalCode": "51643",
-      "city": "Gummersbach",
+      "postalCode": "",
+      "city": "Gummersbach, Germany",
       "countryCode": "DE",
       "region": ""
     },
@@ -21,20 +21,108 @@
       {
         "network": "ORCID",
         "username": "",
-        "url": "https://orcid.org/yourorcidurl"
+        "url": "https://orcid.org/0009-0000-9669-4294"
+      },
+      {
+        "network": "ResearchGate",
+        "username": "",
+        "url": "https://www.researchgate.net/profile/Daniel-Gaida"
       },
       {
         "network": "GitHub",
         "username": "dgaida",
         "url": "https://github.com/dgaida"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "daniel-gaida-63679499",
+        "url": "https://www.linkedin.com/in/daniel-gaida-63679499"
       }
     ]
   },
-  "work": [],
+  "work": [
+    {
+      "company": "Hahn-Schickard",
+      "position": "Gruppenleiter K\u00fcnstliche Intelligenz",
+      "website": "",
+      "startDate": "2018",
+      "endDate": "present",
+      "summary": "",
+      "highlights": [
+        "Experte f\u00fcr Maschinelles Lernen und Computer Vision",
+        "Projektleitung und -akquise im Bereich KI",
+        "Aufbau und Leitung der 7-k\u00f6pfigen KI Forschungsgruppe"
+      ]
+    },
+    {
+      "company": "Hahn-Schickard",
+      "position": "Wissenschaftlicher Mitarbeiter",
+      "website": "",
+      "startDate": "2016",
+      "endDate": "2018",
+      "summary": "",
+      "highlights": [
+        "Experte f\u00fcr Maschinelles Lernen und Computer Vision",
+        "Projektleitung und -akquise im Bereich Sensorfusion",
+        "Algorithmenentwicklung in C++, Matlab, Python"
+      ]
+    },
+    {
+      "company": "Trojan Technologies",
+      "position": "Consultant",
+      "website": "",
+      "startDate": "2016",
+      "endDate": "2016",
+      "summary": "",
+      "highlights": []
+    },
+    {
+      "company": "University of Western Ontario / Trojan Technologies",
+      "position": "Postdoc Position",
+      "website": "",
+      "startDate": "2016",
+      "endDate": "2016",
+      "summary": "",
+      "highlights": []
+    },
+    {
+      "company": "TH K\u00f6ln",
+      "position": "Wissenschaftlicher Mitarbeiter",
+      "website": "",
+      "startDate": "2009",
+      "endDate": "2016",
+      "summary": "",
+      "highlights": [
+        "Experte f\u00fcr Maschinelles Lernen und Computer Vision",
+        "Projektleitung und -arbeit f\u00fcr acht Forschungsprojekte",
+        "Projektakquise, Pr\u00e4sentationen, Studentenbetreuung"
+      ]
+    },
+    {
+      "company": "Fachhochschule K\u00f6ln",
+      "position": "Lehrauftrag Mathematik",
+      "website": "",
+      "startDate": "2012",
+      "endDate": "2013",
+      "summary": "",
+      "highlights": [
+        "\u00dcbungsleitung f\u00fcr Mathematik I und II"
+      ]
+    },
+    {
+      "company": "Fachhochschule K\u00f6ln",
+      "position": "Wissenschaftliche Hilfskraft",
+      "website": "",
+      "startDate": "2006",
+      "endDate": "2007",
+      "summary": "",
+      "highlights": []
+    }
+  ],
   "education": [
     {
       "institution": "Leiden University",
-      "area": "Ph.D in Computer Science",
+      "area": "Promotion der Informatik",
       "studyType": "",
       "startDate": "",
       "endDate": "2014",
@@ -42,20 +130,29 @@
       "courses": []
     },
     {
-      "institution": "GitHub University",
-      "area": "M.S. in Jekyll",
+      "institution": "Fachhochschule D\u00fcsseldorf",
+      "area": "Master of Science in Elektro- und Informationstechnik",
       "studyType": "",
       "startDate": "",
-      "endDate": "2014",
+      "endDate": "2009",
       "gpa": null,
       "courses": []
     },
     {
-      "institution": "GitHub University",
-      "area": "B.S. in GitHub",
+      "institution": "Fachhochschule K\u00f6ln",
+      "area": "Bachelor of Science in Elektrotechnik",
       "studyType": "",
       "startDate": "",
-      "endDate": "2012",
+      "endDate": "2006",
+      "gpa": null,
+      "courses": []
+    },
+    {
+      "institution": "H\u00f6here Berufsfachschule f\u00fcr Technik",
+      "area": "Staatlich gepr\u00fcfter Elektrotechnischer Assistent",
+      "studyType": "",
+      "startDate": "",
+      "endDate": "2003",
       "gpa": null,
       "courses": []
     }
@@ -66,11 +163,109 @@
   "references": [],
   "publications": [
     {
+      "name": "Automatisierung einer Pilot-Biogasanlage mit LabVIEW",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Betriebsoptimierung von Abfallverg\u00e4rungsanlagen mittels Online-Messtechnik und Datenanalyse",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Development of an easy-to-use Membrane WWTP Simulation Software",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Dynamische Echtzeit-Optimierung der Substratzufuhr von landwirtschaftlichen Biogasanlagen",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Gummersbach Environmental Computing Center",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Messung organischer S\u00e4urekonzentration \u00fcber UV/vis Spektroskopie",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Modellbasierte Optimierung und Regelung zur nachhaltigen Energieerzeugung aus Biogas",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Regelung der Substratzufuhr von Biogasanlagen--Ein Review",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "SUBSTRATE FEED OPTIMIZATION AND CONTROL OF AGRICULTURAL BIOGAS PLANTS",
+      "publisher": "",
+      "releaseDate": "1900-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Dynamic real-time substrate feed optimization of anaerobic co-digestion plants",
+      "publisher": "Water Science and Technology",
+      "releaseDate": "2005-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Fusion of visual and inertial measurements for pose estimation",
+      "publisher": "dynamics",
+      "releaseDate": "2008-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
       "name": "Paper Title Number 1",
       "publisher": "Journal 1",
       "releaseDate": "2009-10-01",
       "website": "https://academicpages.github.io/files/paper1.pdf",
       "summary": "This paper is about the number 1. The number 2 is left for future work."
+    },
+    {
+      "name": "A comparison of performance of advanced pattern recognition methods for organic acid prediction in biogas plants using uv/vis spectroscopic online-measurements",
+      "publisher": "Proceedings of the 2010 International Conference on Life System Modeling and Simulation (LSMS), Wuxi, China, 2010",
+      "releaseDate": "2010-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Development of a Simulation Model for hollow-fiber and flat sheet membrane wastewater treatment Plants",
+      "publisher": "Crossing Borders within the ABC: Automation, Biomedical Engineering and Computer Science",
+      "releaseDate": "2010-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Organic acid prediction in biogas plants using UV/vis spectroscopic online-measurements",
+      "publisher": "International Conference on Intelligent Computing for Sustainable Energy and Environment",
+      "releaseDate": "2010-01-01",
+      "website": "",
+      "summary": ""
     },
     {
       "name": "Paper Title Number 2",
@@ -80,6 +275,132 @@
       "summary": "This paper is about the number 2. The number 3 is left for future work."
     },
     {
+      "name": "Matlab toolbox for biogas plant modelling and optimization",
+      "publisher": "Progress in Biogas II-Biogas production from agricultural biomass and organic residues",
+      "releaseDate": "2011-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Optimal control of biogas plants using nonlinear model predictive control",
+      "publisher": "",
+      "releaseDate": "2011-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "An advanced simulation model for membrane bioreactors: development, calibration and validation",
+      "publisher": "Water Science and Technology",
+      "releaseDate": "2012-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Nonlinear model predictive substrate feed control of biogas plants",
+      "publisher": "2012 20th Mediterranean Conference on Control & Automation (MED)",
+      "releaseDate": "2012-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Predicting Organic Acids in Biogas Plants using UV/vis Spectrometry Online-Measurements",
+      "publisher": "no. June",
+      "releaseDate": "2012-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "State estimation for anaerobic digesters using the ADM1",
+      "publisher": "Water science and technology",
+      "releaseDate": "2012-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Predicting organic acid concentration from UV/vis spectrometry measurements--a comparison of machine learning techniques",
+      "publisher": "Transactions of the Institute of Measurement and Control",
+      "releaseDate": "2013-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Steuerungs-und Regelungskonzepte f\u00fcr landwirtschaftliche Biogasanlagen",
+      "publisher": "Biogas in der Landwirtschaft--Stand und Perspektiven, Proceedings FNR/KTBL-Kongress",
+      "releaseDate": "2013-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "COD and NH 4-N estimation in the inflow of Wastewater Treatment Plants using Machine Learning Techniques",
+      "publisher": "2014 IEEE international conference on automation science and engineering (CASE)",
+      "releaseDate": "2014-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Intelligent automation and IT for the optimization of renewable energy and wastewater treatment processes",
+      "publisher": "Energy, Sustainability and Society",
+      "releaseDate": "2014-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Multi-objective nonlinear model predictive substrate feed control of a biogas plant",
+      "publisher": "Kompendium der Forschungsgemeinschaft: metabolon 2012-2014",
+      "releaseDate": "2014-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Online-measurement systems for agricultural and industrial AD plants--A review and practice test",
+      "publisher": "Kompendium der Forschungsgemeinschaft: metabolon 2012-2014",
+      "releaseDate": "2014-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Online monitoring of AD processes using a fully automated, low maintenance middle-infrared (MIR) measurement system",
+      "publisher": "Conf Proc Int Sci Conf Biogas Sci",
+      "releaseDate": "2014-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Dynamische Echtzeit-Optimierung der Substratzufuhr f\u00fcr anaerobe Co-Verg\u00e4rungsanlagen",
+      "publisher": "at-Automatisierungstechnik",
+      "releaseDate": "2015-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Expected hypervolume improvement algorithm for PID controller tuning and the multiobjective dynamical control of a biogas plant",
+      "publisher": "2015 IEEE Congress on Evolutionary Computation (CEC)",
+      "releaseDate": "2015-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Feed Control of Anaerobic Digestion Processes for Sustainable Renewable Energy Production: A Review",
+      "publisher": "Dubrovnik",
+      "releaseDate": "2015-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Instrumentation and control of anaerobic digestion processes: a review and some research challenges",
+      "publisher": "Reviews in Environmental Science and Bio/Technology",
+      "releaseDate": "2015-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Optimizing anaerobic co-digestion plants: MIR online instrumentation and dynamic real-time substrate feed optimization.",
+      "publisher": "Automatisierungstechnik",
+      "releaseDate": "2015-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
       "name": "Paper Title Number 3",
       "publisher": "Journal 1",
       "releaseDate": "2015-10-01",
@@ -87,11 +408,74 @@
       "summary": "This paper is about the number 3. The number 4 is left for future work."
     },
     {
+      "name": "A bias compensated cross-relation approach to thermocouple characterisation",
+      "publisher": "IFAC-PapersOnLine",
+      "releaseDate": "2016-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Multi-fidelity modeling and optimization of biogas plants",
+      "publisher": "Applied Soft Computing",
+      "releaseDate": "2016-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Noise resilient discrete-time cross-relation sensor characterisation",
+      "publisher": "2016 UKACC 11th International Conference on Control (CONTROL)",
+      "releaseDate": "2016-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Process optimization, advanced control, and computational fluid dynamics modelling of wastewater disinfection using peracids",
+      "publisher": "3rd IWA Specialiized International Conference Ecotechnologies for Wastewater Treatment (EcoSTP 2016)",
+      "releaseDate": "2016-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Feed control of anaerobic digestion processes for renewable energy production: A review",
+      "publisher": "Renewable and Sustainable Energy Reviews",
+      "releaseDate": "2017-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "This is How We Do It--Pilot Validation of a Dose (CT)-Based Control for Wastewater Disinfection with peracetic acid",
+      "publisher": "Proceedings of WEFTEC 2017-Water Environment Federation Technical Exhibition and Conference 2017",
+      "releaseDate": "2017-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Tightly coupled fusion of direct stereo visual odometry and inertial sensor measurements using an iterated information filter",
+      "publisher": "2017 DGON Inertial Sensors and Systems (ISS)",
+      "releaseDate": "2017-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
+      "name": "Wastewater disinfection by peracids: advanced dose control technology validation with pilot and modeling studies",
+      "publisher": "12th IWA Specialist Conference on Instrumentation, Control and Automation (ICA 2017)",
+      "releaseDate": "2017-01-01",
+      "website": "",
+      "summary": ""
+    },
+    {
       "name": "Paper Title Number 4",
       "publisher": "GitHub Journal of Bugs",
       "releaseDate": "2024-02-17",
       "website": "https://academicpages.github.io/files/paper3.pdf",
       "summary": "This paper is about fixing template issue #693."
+    },
+    {
+      "name": "Paper Title Number 5, with math $$E=mc^2$$",
+      "publisher": "GitHub Journal of Bugs",
+      "releaseDate": "2024-02-17",
+      "website": "https://academicpages.github.io/files/paper3.pdf",
+      "summary": "This paper is about a famous math equation, $$E=mc^2$$"
     }
   ],
   "presentations": [
@@ -126,9 +510,9 @@
   ],
   "teaching": [
     {
-      "course": "Künstliche Intelligenz",
-      "institution": "TH Köln, Computer Science",
-      "date": "2021-10-01",
+      "course": "Teaching experience 1",
+      "institution": "University 1, Department",
+      "date": "2014-01-01",
       "role": "Undergraduate course",
       "description": ""
     },

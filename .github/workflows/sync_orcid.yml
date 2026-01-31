@@ -21,16 +21,20 @@ jobs:
         
     - name: Install dependencies
       run: |
-        pip install requests
+        pip install requests PyYAML
         
     - name: Run ORCID sync
       run: |
         python scripts/orcid_sync.py
         
+    - name: Update CV JSON
+      run: |
+        bash scripts/update_cv_json.sh
+
     - name: Commit and push if changes
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add _publications/
-        git diff --staged --quiet || git commit -m "Auto-update publications from ORCID"
+        git add _publications/ _data/cv.json
+        git diff --staged --quiet || git commit -m "Auto-update publications and CV from ORCID"
         git push
