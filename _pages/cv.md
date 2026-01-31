@@ -15,7 +15,6 @@ Education
   * Dynamic real-time substrate feed optimization of anaerobic co-digestion plants
 * Master of Science in Elektro- und Informationstechnik, Fachhochschule Düsseldorf, 2009
 * Bachelor of Science in Elektrotechnik, Fachhochschule Köln, 2006
-* Staatlich geprüfter Elektrotechnischer Assistent, Höhere Berufsfachschule für Technik, 2003
 
 Work experience
 ======
@@ -65,4 +64,3 @@ Teaching
   
 Service and leadership
 ======
-* Aufbau und Leitung der 7-köpfigen KI Forschungsgruppe bei Hahn-Schickard

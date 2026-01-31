@@ -46,7 +46,7 @@
       "position": "Gruppenleiter K\u00fcnstliche Intelligenz",
       "website": "",
       "startDate": "2018",
-      "endDate": "present",
+      "endDate": "2021",
       "summary": "",
       "highlights": [
         "Experte f\u00fcr Maschinelles Lernen und Computer Vision",
@@ -124,7 +124,7 @@
       "institution": "Leiden University",
       "area": "Promotion der Informatik",
       "studyType": "",
-      "startDate": "",
+      "startDate": "2009",
       "endDate": "2014",
       "gpa": null,
       "courses": []
@@ -133,7 +133,7 @@
       "institution": "Fachhochschule D\u00fcsseldorf",
       "area": "Master of Science in Elektro- und Informationstechnik",
       "studyType": "",
-      "startDate": "",
+      "startDate": "2006",
       "endDate": "2009",
       "gpa": null,
       "courses": []
@@ -142,17 +142,8 @@
       "institution": "Fachhochschule K\u00f6ln",
       "area": "Bachelor of Science in Elektrotechnik",
       "studyType": "",
-      "startDate": "",
+      "startDate": "2003",
       "endDate": "2006",
-      "gpa": null,
-      "courses": []
-    },
-    {
-      "institution": "H\u00f6here Berufsfachschule f\u00fcr Technik",
-      "area": "Staatlich gepr\u00fcfter Elektrotechnischer Assistent",
-      "studyType": "",
-      "startDate": "",
-      "endDate": "2003",
       "gpa": null,
       "courses": []
     }
@@ -240,13 +231,6 @@
       "summary": ""
     },
     {
-      "name": "Paper Title Number 1",
-      "publisher": "Journal 1",
-      "releaseDate": "2009-10-01",
-      "website": "https://academicpages.github.io/files/paper1.pdf",
-      "summary": "This paper is about the number 1. The number 2 is left for future work."
-    },
-    {
       "name": "A comparison of performance of advanced pattern recognition methods for organic acid prediction in biogas plants using uv/vis spectroscopic online-measurements",
       "publisher": "Proceedings of the 2010 International Conference on Life System Modeling and Simulation (LSMS), Wuxi, China, 2010",
       "releaseDate": "2010-01-01",
@@ -266,13 +250,6 @@
       "releaseDate": "2010-01-01",
       "website": "",
       "summary": ""
-    },
-    {
-      "name": "Paper Title Number 2",
-      "publisher": "Journal 1",
-      "releaseDate": "2010-10-01",
-      "website": "https://academicpages.github.io/files/paper2.pdf",
-      "summary": "This paper is about the number 2. The number 3 is left for future work."
     },
     {
       "name": "Matlab toolbox for biogas plant modelling and optimization",
@@ -401,13 +378,6 @@
       "summary": ""
     },
     {
-      "name": "Paper Title Number 3",
-      "publisher": "Journal 1",
-      "releaseDate": "2015-10-01",
-      "website": "https://academicpages.github.io/files/paper3.pdf",
-      "summary": "This paper is about the number 3. The number 4 is left for future work."
-    },
-    {
       "name": "A bias compensated cross-relation approach to thermocouple characterisation",
       "publisher": "IFAC-PapersOnLine",
       "releaseDate": "2016-01-01",
@@ -462,20 +432,6 @@
       "releaseDate": "2017-01-01",
       "website": "",
       "summary": ""
-    },
-    {
-      "name": "Paper Title Number 4",
-      "publisher": "GitHub Journal of Bugs",
-      "releaseDate": "2024-02-17",
-      "website": "https://academicpages.github.io/files/paper3.pdf",
-      "summary": "This paper is about fixing template issue #693."
-    },
-    {
-      "name": "Paper Title Number 5, with math $$E=mc^2$$",
-      "publisher": "GitHub Journal of Bugs",
-      "releaseDate": "2024-02-17",
-      "website": "https://academicpages.github.io/files/paper3.pdf",
-      "summary": "This paper is about a famous math equation, $$E=mc^2$$"
     }
   ],
   "presentations": [
@@ -492,35 +448,21 @@
       "date": "2013-03-01",
       "location": "Berkeley, CA, USA",
       "description": ""
-    },
-    {
-      "name": "Talk 2 on Relevant Topic in Your Field",
-      "event": "London School of Testing",
-      "date": "2014-02-01",
-      "location": "London, UK",
-      "description": ""
-    },
-    {
-      "name": "Conference Proceeding talk 3 on Relevant Topic in Your Field",
-      "event": "Testing Institute of America 2014 Annual Conference",
-      "date": "2014-03-01",
-      "location": "Los Angeles, CA, USA",
-      "description": ""
     }
   ],
   "teaching": [
     {
-      "course": "Teaching experience 1",
-      "institution": "University 1, Department",
-      "date": "2014-01-01",
+      "course": "Künstliche Intelligenz",
+      "institution": "TH Köln, Institut für Informatik",
+      "date": "2021-10-01",
       "role": "Undergraduate course",
       "description": ""
     },
     {
-      "course": "Teaching experience 2",
-      "institution": "University 1, Department",
-      "date": "2015-01-01",
-      "role": "Workshop",
+      "course": "Algorithmik",
+      "institution": "TH Köln, Institut für Informatik",
+      "date": "2022-10-01",
+      "role": "Undergraduate course",
       "description": ""
     }
   ],
