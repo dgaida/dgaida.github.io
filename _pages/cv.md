@@ -11,35 +11,39 @@ redirect_from:
 
 Education
 ======
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
-* M.S. in Jekyll, GitHub University, 2014
-* B.S. in GitHub, GitHub University, 2012
+* Promotion der Informatik, Leiden University, 2014
+  * Dynamic real-time substrate feed optimization of anaerobic co-digestion plants
+* Master of Science in Elektro- und Informationstechnik, Fachhochschule Düsseldorf, 2009
+* Bachelor of Science in Elektrotechnik, Fachhochschule Köln, 2006
+* Staatlich geprüfter Elektrotechnischer Assistent, Höhere Berufsfachschule für Technik, 2003
 
 Work experience
 ======
-* Spring 2024: Academic Pages Collaborator
-  * GitHub University
-  * Duties includes: Updates and improvements to template
-  * Supervisor: The Users
+* Gruppenleiter Künstliche Intelligenz, Hahn-Schickard, 2018 - present
+  * Experte für Maschinelles Lernen und Computer Vision
+  * Projektleitung und -akquise im Bereich KI
+  * Aufbau und Leitung der 7-köpfigen KI Forschungsgruppe
+* Wissenschaftlicher Mitarbeiter, Hahn-Schickard, 2016 - 2018
+  * Experte für Maschinelles Lernen und Computer Vision
+  * Projektleitung und -akquise im Bereich Sensorfusion
+  * Algorithmenentwicklung in C++, Matlab, Python
+* Consultant, Trojan Technologies, 2016 - 2016
+* Postdoc Position, University of Western Ontario / Trojan Technologies, 2016 - 2016
+* Wissenschaftlicher Mitarbeiter, TH Köln, 2009 - 2016
+  * Experte für Maschinelles Lernen und Computer Vision
+  * Projektleitung und -arbeit für acht Forschungsprojekte
+  * Projektakquise, Präsentationen, Studentenbetreuung
+* Lehrauftrag Mathematik, Fachhochschule Köln, 2012 - 2013
+  * Übungsleitung für Mathematik I und II
+* Wissenschaftliche Hilfskraft, Fachhochschule Köln, 2006 - 2007
 
-* Fall 2015: Research Assistant
-  * GitHub University
-  * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
-
-* Summer 2015: Research Assistant
-  * GitHub University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
-  
 Skills
 ======
-* Skill 1
-* Skill 2
-  * Sub-skill 2.1
-  * Sub-skill 2.2
-  * Sub-skill 2.3
-* Skill 3
+* Maschinelles Lernen
+* Computer Vision
+* Sensorfusion
+* Algorithmenentwicklung (C++, Matlab, Python)
+* Projektleitung und -akquise
 
 Publications
 ======
@@ -61,4 +65,4 @@ Teaching
   
 Service and leadership
 ======
-* Currently signed in to 43 different slack teams
+* Aufbau und Leitung der 7-köpfigen KI Forschungsgruppe bei Hahn-Schickard
