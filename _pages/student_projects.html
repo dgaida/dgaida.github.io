@@ -11,7 +11,7 @@ author_profile: true
 {% assign other_projects = site.student_projects | where_exp: "item", "item.type == nil" %}
 
 {% for post in other_projects %}
-  {% include archive-single.html %}
+  {% include archive-single.html hide_details=true %}
 {% endfor %}
 
 {% assign projects_by_type = typed_projects | group_by: 'type' %}
@@ -32,7 +32,7 @@ author_profile: true
         <h3 id="{{ type_name | slugify }}-{{ post.semester | slugify }}">{{ post.semester }}</h3>
         {% assign current_semester = post.semester %}
       {% endif %}
-      {% include archive-single.html %}
+      {% include archive-single.html hide_details=true %}
     {% endfor %}
   {% endif %}
 {% endfor %}
