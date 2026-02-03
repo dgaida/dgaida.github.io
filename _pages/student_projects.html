@@ -7,8 +7,32 @@ author_profile: true
 
 {% include base_path %}
 
+{% assign typed_projects = site.student_projects | where_exp: "item", "item.type != nil" %}
+{% assign other_projects = site.student_projects | where_exp: "item", "item.type == nil" %}
 
-{% for post in site.student_projects %}
+{% for post in other_projects %}
   {% include archive-single.html %}
 {% endfor %}
 
+{% assign projects_by_type = typed_projects | group_by: 'type' %}
+
+{% comment %} Define the order of types {% endcomment %}
+{% assign type_order = "Bachelorthesis,Masterthesis,Praxisprojekt" | split: "," %}
+
+{% for type_name in type_order %}
+  {% assign type_group = projects_by_type | where: "name", type_name | first %}
+  {% if type_group %}
+    <h2 id="{{ type_name | slugify }}">{{ type_name }}</h2>
+
+    {% assign sorted_items = type_group.items | sort: 'date' | reverse %}
+    {% assign current_semester = "" %}
+
+    {% for post in sorted_items %}
+      {% if post.semester != current_semester %}
+        <h3 id="{{ type_name | slugify }}-{{ post.semester | slugify }}">{{ post.semester }}</h3>
+        {% assign current_semester = post.semester %}
+      {% endif %}
+      {% include archive-single.html %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}

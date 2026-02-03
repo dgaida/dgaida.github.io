@@ -1,0 +1,5 @@
+git+https://github.com/dgaida/llm_client.git
+git+https://github.com/dgaida/colloquium-protocol-creator.git
+pypdf
+docling
+groq
