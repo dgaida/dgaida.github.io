@@ -2,7 +2,7 @@ import os
 import re
 import json
 from datetime import datetime
-from core import llm_interface
+from academic_doc_generator.core import llm_interface, pdf_processing
 from llm_client import LLMClient
 
 # Configuration
@@ -61,7 +61,6 @@ Summary:
     return llm_client.chat_completion(messages).strip()
 
 def process_pdf(pdf_path, llm_client):
-    from core import pdf_processing
     print(f"Processing PDF: {pdf_path}")
 
     # Extract plain text for metadata and summary
