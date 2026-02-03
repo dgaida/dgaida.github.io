@@ -7,6 +7,8 @@ excerpt: |
 
   <iframe width="50%" height="25" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
 collection: student_projects
+type: "Masterthesis"
+semester: "Wintersemester 25/26"
 ---
 
 Masterthesis von Tim Y. Nordhoff mit dem Titel: . 
