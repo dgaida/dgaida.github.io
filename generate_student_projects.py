@@ -15,6 +15,7 @@ TYPE_MAPPING = {
     "PraxisProjekte": "Praxisprojekt"
 }
 
+
 def get_semester_name(folder_name):
     folder_name_upper = folder_name.upper()
     # Wintersemester
@@ -45,10 +46,11 @@ def get_semester_name(folder_name):
             return f"Sommersemester {y}"
     return folder_name
 
-def summarize_for_web(pages_text, llm_client):
+
+def summarize_for_web(pages_text, llm_client, author):
     full_text = "\n\n".join([pages_text.get(i, "") for i in sorted(pages_text.keys())])
     prompt = f"""
-You are given the first ten pages of a student's thesis or project report.
+You are given the first ten pages of a student's thesis or project report. The name of the student is {author}. 
 Please provide a very concise summary (2-3 sentences) in English that is suitable for publication on a website.
 It should be easy to understand for a general audience.
 
@@ -60,6 +62,7 @@ Summary:
     messages = [{"role": "user", "content": prompt}]
     return llm_client.chat_completion(messages).strip()
 
+
 def process_pdf(pdf_path, llm_client):
     print(f"Processing PDF: {pdf_path}")
 
@@ -70,7 +73,7 @@ def process_pdf(pdf_path, llm_client):
     metadata = llm_interface.extract_document_metadata(pages_text, "German", llm_client, pdf_path=pdf_path)
 
     # Generate summary
-    summary = summarize_for_web(pages_text, llm_client)
+    summary = summarize_for_web(pages_text, llm_client, metadata.get("author", "Unknown Author"))
 
     # Get last modified date
     mtime = os.path.getmtime(pdf_path)
@@ -96,7 +99,7 @@ def main():
             print(f"Path not found: {base_path}")
             continue
 
-        work_type = TYPE_MAPPING.get(base_path, "Other")
+        work_type = TYPE_MAPPING.get(base_path_i, "Other")
 
         for semester_folder in os.listdir(base_path):
             semester_path = os.path.join(base_path, semester_folder)
@@ -145,7 +148,7 @@ def main():
                 # format: {year}_{semester}_{author}.md
                 year = result['date'][:4]
                 author_slug = result['author'].lower().replace(" ", "_").replace(",", "").replace(".", "")
-                md_filename = f"{year}_{semester_folder.lower()}_{author_slug}.md"
+                md_filename = f"{year}_{semester_folder.lower()}_{base_path_i[:2].lower()}_{author_slug}.md"
                 md_path = os.path.join(OUTPUT_DIR, md_filename)
 
                 content = f"""---
@@ -164,6 +167,7 @@ semester: "{semester_name}"
                 with open(md_path, 'w', encoding='utf-8') as f:
                     f.write(content)
                 print(f"Generated: {md_path}")
+
 
 if __name__ == "__main__":
     main()
