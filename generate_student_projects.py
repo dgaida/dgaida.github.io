@@ -89,7 +89,9 @@ def main():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
 
-    for base_path in BASE_PATHS:
+    for base_path_i in BASE_PATHS:
+        base_path = os.path.join("..", "BachelorMasterThesen", base_path_i)
+
         if not os.path.exists(base_path):
             print(f"Path not found: {base_path}")
             continue
