@@ -47,12 +47,12 @@ def get_semester_name(folder_name):
     return folder_name
 
 
-def summarize_for_web(pages_text, llm_client, author):
+def summarize_for_web(pages_text, llm_client):
     full_text = "\n\n".join([pages_text.get(i, "") for i in sorted(pages_text.keys())])
     prompt = f"""
-You are given the first ten pages of a student's thesis or project report. The name of the student is {author}. 
+You are given the first ten pages of a student's thesis or project report. 
 Please provide a very concise summary (2-3 sentences) in English that is suitable for publication on a website.
-It should be easy to understand for a general audience.
+It should be easy to understand for a general audience. Do not write 'A student ...' but use passive voice instead.
 
 Text:
 {full_text}
@@ -73,7 +73,7 @@ def process_pdf(pdf_path, llm_client):
     metadata = llm_interface.extract_document_metadata(pages_text, "German", llm_client, pdf_path=pdf_path)
 
     # Generate summary
-    summary = summarize_for_web(pages_text, llm_client, metadata.get("author", "Unknown Author"))
+    summary = summarize_for_web(pages_text, llm_client)
 
     # Get last modified date
     mtime = os.path.getmtime(pdf_path)
