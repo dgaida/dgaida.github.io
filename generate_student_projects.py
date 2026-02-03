@@ -119,7 +119,7 @@ def main():
                     continue
 
                 print(f"Found JSON: {json_file}")
-                with open(json_file, 'r') as f:
+                with open(json_file, 'r', encoding='utf-8') as f:
                     try:
                         data = json.load(f)
                     except json.JSONDecodeError:
@@ -159,7 +159,7 @@ semester: "{semester_name}"
 
 {result['summary']}
 """
-                with open(md_path, 'w') as f:
+                with open(md_path, 'w', encoding='utf-8') as f:
                     f.write(content)
                 print(f"Generated: {md_path}")
 
