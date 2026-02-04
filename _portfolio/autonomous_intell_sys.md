@@ -3,7 +3,7 @@ title: "Development of autonomous intelligent systems"
 excerpt: |
   I am working on a framework that enables robots to follow natural-language instructions by combining large language models with real-time perception, spatial reasoning, and robot control through a modular tool-based system. 
 
-  <iframe width="40%" height="20" src="https://www.youtube.com/embed/UqnlQGJjy4U" frameborder="0" allowfullscreen></iframe>
+  <iframe width="35%" height="22" src="https://www.youtube.com/embed/UqnlQGJjy4U" frameborder="0" allowfullscreen></iframe>
 collection: portfolio
 ---
 
@@ -13,4 +13,4 @@ The system was evaluated on a range of manipulation tasks with a robotic arm, sh
 
 All tools, controllers, and environment components are publicly available at <a href='https://github.com/dgaida/robot_mcp'>github.com/dgaida/robot_mcp</a>.
 
-<iframe width="60%" height="50" src="https://www.youtube.com/embed/UqnlQGJjy4U" frameborder="0" allowfullscreen></iframe>
+<iframe width="60%" height="40" src="https://www.youtube.com/embed/UqnlQGJjy4U" frameborder="0" allowfullscreen></iframe>
