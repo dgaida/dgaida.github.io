@@ -1,5 +1,5 @@
 ---
-title: "Portfolio item number 1"
+title: "Verbundvorhaben: Intelligenter Virtueller Betriebsassistent zur Optimierung landwirtschaftlicher Biogasanlagen durch ein Large Multimodal Model"
 excerpt: "Short description of portfolio item number 1<br/><img src='/images/500x300.png'>"
 collection: portfolio
 ---
