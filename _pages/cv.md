@@ -18,30 +18,19 @@ Education
 
 Work experience
 ======
-* Gruppenleiter Künstliche Intelligenz, Hahn-Schickard, 2018 - present
-  * Experte für Maschinelles Lernen und Computer Vision
+* Professor für Cyber-Physische Systeme, TH Köln, 2021 - present
+* Gruppenleiter Künstliche Intelligenz, Hahn-Schickard, 2018 - 2021
   * Projektleitung und -akquise im Bereich KI
   * Aufbau und Leitung der 7-köpfigen KI Forschungsgruppe
 * Wissenschaftlicher Mitarbeiter, Hahn-Schickard, 2016 - 2018
-  * Experte für Maschinelles Lernen und Computer Vision
-  * Projektleitung und -akquise im Bereich Sensorfusion
-  * Algorithmenentwicklung in C++, Matlab, Python
 * Consultant, Trojan Technologies, 2016 - 2016
 * Postdoc Position, University of Western Ontario / Trojan Technologies, 2016 - 2016
 * Wissenschaftlicher Mitarbeiter, TH Köln, 2009 - 2016
-  * Experte für Maschinelles Lernen und Computer Vision
-  * Projektleitung und -arbeit für acht Forschungsprojekte
-  * Projektakquise, Präsentationen, Studentenbetreuung
-* Lehrauftrag Mathematik, Fachhochschule Köln, 2012 - 2013
-  * Übungsleitung für Mathematik I und II
-* Wissenschaftliche Hilfskraft, Fachhochschule Köln, 2006 - 2007
 
 Skills
 ======
-* Maschinelles Lernen
-* Computer Vision
-* Sensorfusion
-* Algorithmenentwicklung (C++, Matlab, Python)
+* Physische Künstliche Intelligenz
+* Cyber-Physische Systeme
 * Projektleitung und -akquise
 
 Publications
