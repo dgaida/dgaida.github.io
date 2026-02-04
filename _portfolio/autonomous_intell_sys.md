@@ -1,7 +1,9 @@
 ---
 title: "Development of autonomous intelligent systems"
 excerpt: |
-  I am working on a framework that enables robots to follow natural-language instructions by combining large language models with real-time perception, spatial reasoning, and robot control through a modular tool-based system. <br/><iframe width="20%" height="10" src="https://youtu.be/UqnlQGJjy4U" frameborder="0" allowfullscreen></iframe>
+  I am working on a framework that enables robots to follow natural-language instructions by combining large language models with real-time perception, spatial reasoning, and robot control through a modular tool-based system. 
+
+  <iframe width="20%" height="10" src="https://youtu.be/UqnlQGJjy4U" frameborder="0" allowfullscreen></iframe>
 collection: portfolio
 ---
 
