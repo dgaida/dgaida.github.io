@@ -32,5 +32,8 @@ main:
   # - title: "CV"
   #   url: /cv-json/
     
+  - title: "TH/PAV"
+    url: /th_pav/
+
   - title: "Guide"
     url: /markdown/
