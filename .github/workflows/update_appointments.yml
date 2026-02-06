@@ -1,0 +1,35 @@
+name: Update Appointments
+
+on:
+  schedule:
+    - cron: '0 0 28 2 *'
+    - cron: '0 0 31 8 *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install docling icalendar pandas requests
+      - name: Run script
+        run: python scripts/parse_appointments.py
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add files/appointments.ics
+          if ! git diff --cached --quiet; then
+            git commit -m "Update appointments ICS file"
+            git push
+          else
+            echo "No changes to commit"
+          fi
