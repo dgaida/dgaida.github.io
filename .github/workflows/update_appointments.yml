@@ -26,7 +26,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add files/appointments.ics
+          git add files/f10_appointments.ics
           if ! git diff --cached --quiet; then
             git commit -m "Update appointments ICS file"
             git push

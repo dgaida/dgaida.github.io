@@ -89,8 +89,20 @@ def parse_campus_appointments(pdf_url, cal):
                 else:
                     end_dt = start_dt + timedelta(days=1)
 
+                # Split description by dash (en-dash or hyphen)
+                # Part before dash is summary, part after is location
+                summary = desc
+                location = None
+                dash_match = re.split(r' [–-] ', desc, maxsplit=1)
+                if len(dash_match) == 2:
+                    summary = dash_match[0].strip()
+                    location = dash_match[1].strip()
+
                 event = Event()
-                event.add('summary', desc)
+                event.add('summary', summary)
+                if location:
+                    event.add('location', location)
+
                 if is_all_day:
                     event.add('dtstart', start_dt.date())
                     event.add('dtend', end_dt.date())
@@ -198,7 +210,7 @@ def parse_pruefungszeiten(pdf_url, cal):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Parse TH Köln appointments to ICS.')
-    parser.add_argument('--output', type=str, default='files/appointments.ics', help='Output ICS file path')
+    parser.add_argument('--output', type=str, default='files/f10_appointments.ics', help='Output ICS file path')
     args = parser.parse_args()
 
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
@@ -208,6 +220,7 @@ if __name__ == "__main__":
     cal = Calendar()
     cal.add('prodid', '-//TH Köln Campus Gummersbach Appointments//mxm.dk//')
     cal.add('version', '2.0')
+    cal.add('X-WR-CALNAME', 'Termine F10 Campus Gummersbach')
 
     total_events = 0
 
