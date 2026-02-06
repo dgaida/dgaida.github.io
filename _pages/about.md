@@ -11,7 +11,7 @@ Ich bin Professor für Cyber-Physische Systeme an der [TH Köln](https://www.th-
 
 ## Forschungsinteressen
 
-Meine Forschung konzentriert sich auf:
+Meine [Forschung](portfolio.html) konzentriert sich auf:
 
 - Cyber-Physische Systeme
 - Angewandte und Physische Künstliche Intelligenz
