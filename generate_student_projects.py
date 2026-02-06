@@ -2,7 +2,7 @@ import os
 import re
 import json
 from datetime import datetime
-from academic_doc_generator.core import llm_interface, pdf_processing
+from academic_doc_generator.core import llm_interface, pdf_processing, web_metadata
 from llm_client import LLMClient
 
 # Configuration
@@ -47,45 +47,6 @@ def get_semester_name(folder_name):
     return folder_name
 
 
-def get_initials(name):
-    if not name or name == "Unknown Author":
-        return "U. A."
-    # Replace hyphens with spaces to treat as separate parts
-    name_clean = name.replace("-", " ")
-    parts = name_clean.split()
-    initials = [p[0].upper() + "." for p in parts if p]
-    return " ".join(initials)
-
-
-def get_author_slug(name):
-    if not name or name == "Unknown Author":
-        return "unkn"
-    # Replace hyphens with spaces
-    name_clean = name.replace("-", " ")
-    parts = name_clean.split()
-    if len(parts) >= 2:
-        first = parts[0][:2].lower()
-        last = parts[-1][:2].lower()
-        return first + last
-    elif len(parts) == 1:
-        return parts[0][:4].lower()
-    return "unkn"
-
-
-def summarize_for_web(pages_text, llm_client):
-    full_text = "\n\n".join([pages_text.get(i, "") for i in sorted(pages_text.keys())])
-    prompt = f"""
-You are given the first ten pages of a student's thesis or project report. 
-Please provide a very concise summary (2-3 sentences) in English that is suitable for publication on a website.
-It should be easy to understand for a general audience. Do not write 'A student ...' or mention the student's name, but use passive voice instead.
-
-Text:
-{full_text}
-
-Summary:
-"""
-    messages = [{"role": "user", "content": prompt}]
-    return llm_client.chat_completion(messages).strip()
 
 
 def process_pdf(pdf_path, llm_client):
@@ -97,19 +58,11 @@ def process_pdf(pdf_path, llm_client):
     # Extract metadata
     metadata = llm_interface.extract_document_metadata(pages_text, "German", llm_client, pdf_path=pdf_path)
 
-    # Generate summary
-    summary = summarize_for_web(pages_text, llm_client)
-
     # Get last modified date
     mtime = os.path.getmtime(pdf_path)
     date_str = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d')
 
-    return {
-        "title": metadata.get("title", "Unknown Title"),
-        "author": metadata.get("author", "Unknown Author"),
-        "date": date_str,
-        "summary": summary
-    }
+    return pages_text, metadata, date_str
 
 def main():
     llm_client = LLMClient()
@@ -167,37 +120,19 @@ def main():
                     print(f"PDF not found: {pdf_path}")
                     continue
 
-                result = process_pdf(pdf_path, llm_client)
+                pages_text, metadata, date_str = process_pdf(pdf_path, llm_client)
 
-                full_author = result.get('author', "Unknown Author")
-                initials = get_initials(full_author)
-                author_slug = get_author_slug(full_author)
-
-                summary = result.get('summary', "")
-                if full_author != "Unknown Author":
-                    summary = summary.replace(full_author, initials)
-
-                # Create .md filename
-                # format: {year}_{semester}_{author_slug}.md
-                year = result['date'][:4]
-                md_filename = f"{year}_{semester_folder.lower()}_{base_path_i[:2].lower()}_{author_slug}.md"
-                md_path = os.path.join(OUTPUT_DIR, md_filename)
-
-                content = f"""---
-title: "{result['title']}"
-author: "{initials}"
-date: "{result['date']}"
-excerpt: |
-  {summary}
-collection: student_projects
-type: "{work_type}"
-semester: "{semester_name}"
----
-
-{summary}
-"""
-                with open(md_path, 'w', encoding='utf-8') as f:
-                    f.write(content)
+                # Generate web metadata file using the library method
+                md_path = web_metadata.generate_web_metadata_file(
+                    output_folder=OUTPUT_DIR,
+                    title=metadata.get("title", "Unknown Title"),
+                    author=metadata.get("author", "Unknown Author"),
+                    pages_text=pages_text,
+                    llm_client=llm_client,
+                    work_type=work_type,
+                    semester=semester_name,
+                    date_str=date_str
+                )
                 print(f"Generated: {md_path}")
 
 
