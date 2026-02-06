@@ -2,8 +2,8 @@ name: Sync ORCID Publications
 
 on:
   schedule:
-    # Läuft jeden Montag um 3 Uhr morgens
-    - cron: '0 3 * * 1'
+    # Läuft jährlich
+    - cron: '0 3 1 1 *'
   workflow_dispatch:  # Ermöglicht manuelles Auslösen
 
 jobs:
