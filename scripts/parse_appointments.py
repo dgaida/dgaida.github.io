@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import requests
 from datetime import datetime, timedelta
 from docling.document_converter import DocumentConverter
@@ -19,7 +20,7 @@ def scrape_pdf_links():
         'pruefungszeiten': None
     }
     try:
-        response = requests.get(BASE_URL)
+        response = requests.get(BASE_URL, timeout=30)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -49,8 +50,9 @@ def scrape_pdf_links():
 def parse_campus_appointments(pdf_url, cal):
     print(f"Parsing Campus-Termine from {pdf_url}...")
     try:
-        response = requests.get(pdf_url)
+        response = requests.get(pdf_url, timeout=30)
         if response.status_code != 200:
+            print(f"Failed to download PDF: {pdf_url} (Status: {response.status_code})")
             return 0
 
         with open("temp_campus.pdf", "wb") as f:
@@ -141,8 +143,9 @@ def is_strikethrough(page, table_cell):
 def parse_pruefungszeiten(pdf_url, cal):
     print(f"Parsing Prüfungszeiten from {pdf_url}...")
     try:
-        response = requests.get(pdf_url)
+        response = requests.get(pdf_url, timeout=30)
         if response.status_code != 200:
+            print(f"Failed to download PDF: {pdf_url} (Status: {response.status_code})")
             return 0
 
         with open("temp_pruefung.pdf", "wb") as f:
@@ -239,4 +242,5 @@ if __name__ == "__main__":
             f.write(cal.to_ical())
         print(f"Successfully saved {total_events} events to {args.output}")
     else:
-        print("No events found.")
+        print("No events found. This might indicate a scraping or parsing failure.")
+        sys.exit(1)
