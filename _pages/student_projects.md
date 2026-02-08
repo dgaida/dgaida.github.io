@@ -21,7 +21,7 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
   content: '';
   position: absolute;
   width: 6px;
-  background-color: #f1f1f1;
+  background-color: rgba(128, 128, 128, 0.2);
   top: 0;
   bottom: 0;
   left: 50%;
@@ -39,8 +39,8 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
   width: 25px;
   height: 25px;
   right: -17px;
-  background-color: white;
-  border: 4px solid #333;
+  background-color: var(--global-bg-color, white);
+  border: 4px solid var(--global-text-color, #333);
   top: 15px;
   border-radius: 50%;
   z-index: 1;
@@ -51,11 +51,11 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
 .right::after { left: -12px; }
 .timeline-content {
   padding: 20px 30px;
-  background-color: white;
+  background-color: var(--global-bg-color, white);
   position: relative;
   border-radius: 6px;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
-  border: 1px solid #eee;
+  border: 1px solid var(--global-border-color, #eee);
 }
 @media screen and (max-width: 600px) {
   .timeline::after { left: 31px; }
@@ -68,8 +68,9 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
 .project-filters {
   margin-bottom: 30px;
   padding: 20px;
-  background: #f9f9f9;
+  background: rgba(128, 128, 128, 0.05);
   border-radius: 8px;
+  border: 1px solid var(--global-border-color, #eee);
 }
 .filter-group {
   display: flex;
@@ -80,7 +81,9 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
 .filter-group select, .filter-group input {
   padding: 8px;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--global-border-color, #ccc);
+  background-color: var(--global-bg-color, white);
+  color: var(--global-text-color, inherit);
 }
 .filter-group input { flex-grow: 1; }
 
@@ -88,14 +91,15 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
 .stats-container {
   display: flex;
   justify-content: space-around;
-  background: #f9f9f9;
+  background: rgba(128, 128, 128, 0.05);
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 30px;
   text-align: center;
+  border: 1px solid var(--global-border-color, #eee);
 }
 .stat-item h3 { margin: 0; font-size: 1.2em; }
-.stat-item p { margin: 5px 0 0; font-weight: bold; font-size: 1.5em; color: #333; }
+.stat-item p { margin: 5px 0 0; font-weight: bold; font-size: 1.5em; color: var(--global-text-color, #333); }
 </style>
 
 {% assign projects = site.student_projects | sort: 'date' | reverse %}
@@ -119,20 +123,16 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
 <div class="stats-container">
   <div class="stat-item">
     <h3>Nach Typ:</h3>
-    {% assign types = projects | map: 'type' | uniq %}
-    {% for type in types %}
-      {% if type %}
+    {% assign stat_types = projects | map: 'type' | uniq | compact | sort %}
+    {% for type in stat_types %}
       <span style="font-size: 0.9em;">{{ type }}: {{ projects | where: "type", type | size }}</span><br>
-      {% endif %}
     {% endfor %}
   </div>
   <div class="stat-item">
     <h3>Nach Semester:</h3>
-    {% assign semesters = projects | map: 'semester' | uniq %}
-    {% for sem in semesters %}
-      {% if sem %}
+    {% assign stat_semesters = projects | map: 'semester' | uniq | compact | sort | reverse %}
+    {% for sem in stat_semesters %}
       <span style="font-size: 0.9em;">{{ sem }}: {{ projects | where: "semester", sem | size }}</span><br>
-      {% endif %}
     {% endfor %}
   </div>
   <div class="stat-item">
@@ -178,25 +178,27 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
   </div>
 </div>
 
-{% for project_type in types %}
-  {% if project_type %}
-  <h3 id="{{ project_type | slugify }}">{{ project_type }}</h3>
-  {% assign type_projects = projects | where: "type", project_type %}
-  {% assign semester_groups = type_projects | map: 'semester' | uniq | sort | reverse %}
+{% assign types_list = projects | map: 'type' | uniq | compact | sort %}
+{% for project_type in types_list %}
 
-  {% for sem in semester_groups %}
-    {% if sem %}
-    <h4 style="color: #666;">{{ sem }}</h4>
-    <div class="entries-{{ project_type | slugify }}">
-    {% for post in type_projects %}
-      {% if post.semester == sem %}
-        {% include archive-single.html hide_details=true %}
-      {% endif %}
-    {% endfor %}
-    </div>
-    {% endif %}
-  {% endfor %}
-  {% endif %}
+<h3 id="{{ project_type | slugify }}">{{ project_type }}</h3>
+
+{% assign type_projects = projects | where: "type", project_type %}
+{% assign semester_groups = type_projects | map: 'semester' | uniq | compact | sort | reverse %}
+
+{% for sem in semester_groups %}
+
+<h4 style="color: #666;">{{ sem }}</h4>
+
+<div class="entries-{{ project_type | slugify }}">
+{% for post in type_projects %}
+{% if post.semester == sem %}
+{% include archive-single.html hide_details=true %}
+{% endif %}
+{% endfor %}
+</div>
+
+{% endfor %}
 {% endfor %}
 
 <script src="{{ '/assets/js/filter-projects.js' | relative_url }}"></script>
