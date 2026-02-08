@@ -148,18 +148,32 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
   <div class="filter-group">
     <select id="type-filter">
       <option value="">Alle Typen</option>
-      {% assign types = projects | map: 'type' | uniq | sort %}
-      {% for type in types %}{% if type %}<option value="{{ type }}">{{ type }}</option>{% endif %}{% endfor %}
+      {% assign types = projects | map: 'type' | uniq %}
+      {% assign types_sorted = types | compact | sort %}
+      {% for type in types_sorted %}<option value="{{ type }}">{{ type }}</option>{% endfor %}
     </select>
     <select id="semester-filter">
       <option value="">Alle Semester</option>
-      {% assign semesters = projects | map: 'semester' | uniq | sort | reverse %}
-      {% for sem in semesters %}{% if sem %}<option value="{{ sem }}">{{ sem }}</option>{% endif %}{% endfor %}
+      {% assign semesters = projects | map: 'semester' | uniq %}
+      {% assign semesters_sorted = semesters | compact | sort | reverse %}
+      {% for sem in semesters_sorted %}<option value="{{ sem }}">{{ sem }}</option>{% endfor %}
     </select>
     <select id="tag-filter">
       <option value="">Alle Themen</option>
-      {% assign all_tags = projects | map: 'tags' | flatten | uniq | sort %}
-      {% for tag in all_tags %}{% if tag %}<option value="{{ tag }}">{{ tag }}</option>{% endif %}{% endfor %}
+      {% assign all_tags = "" | split: "," %}
+      {% for project in projects %}
+        {% if project.tags %}
+          {% for tag in project.tags %}
+            {% assign all_tags = all_tags | push: tag %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+      {% assign all_tags_sorted = all_tags | uniq | compact | sort %}
+      {% for tag in all_tags_sorted %}
+        {% if tag != "" %}
+          <option value="{{ tag }}">{{ tag }}</option>
+        {% endif %}
+      {% endfor %}
     </select>
   </div>
 </div>
