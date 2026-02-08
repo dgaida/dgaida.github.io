@@ -1,0 +1,15 @@
+name: Check Links
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # Monatlich
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check broken links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress './**/*.md' './**/*.html'

@@ -1,6 +1,9 @@
 # Academic Pages
 **Academic Pages is a GitHub Pages template for personal and professional portfolio-oriented websites.**
 
+![Build Status](https://github.com/academicpages/academicpages.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ![Academic Pages template example](images/themes/homepage-light.png "Academic Pages template example")
 
 # Getting Started
@@ -82,6 +85,26 @@ This repository was forked (then detached) by [Stuart Geiger](https://github.com
 If you have bugfixes and enhancements that you would like to submit as a pull request, you will need to [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) this repository as opposed to using it as a template. This will also allow you to [synchronize your copy](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) of template to your fork as well.
 
 Unfortunately, one logistical issue with a template theme like Academic Pages that makes it a little tricky to get bug fixes and updates to the core theme. If you use this template and customize it, you will probably get merge conflicts if you attempt to synchronize. If you want to save your various .yml configuration files and markdown files, you can delete the repository and fork it again. Or you can manually patch.
+
+# Automatisierung
+
+Dieses Repository enthält verschiedene Skripte zur Automatisierung der Inhalte:
+
+## Automatische Publikationssynchronisation (ORCID)
+Das Skript `scripts/orcid_sync.py` ermöglicht es, Publikationen automatisch von einem ORCID-Profil zu synchronisieren.
+- Es liest die ORCID-ID aus der `_config.yml` (Feld `author.orcid`).
+- Neue Publikationen werden als Markdown-Dateien im Verzeichnis `_publications/` erstellt.
+- Vorhandene Dateien werden nicht überschrieben.
+
+## Studentische Projekte (PDF-Verarbeitung)
+Das Skript `generate_student_projects.py` automatisiert die Erstellung von Projektseiten aus Abschlussarbeiten (PDFs).
+- Es scannt die Verzeichnisse `BachelorThesen`, `MasterThesen` und `PraxisProjekte`.
+- Es nutzt LLM-Technologie (über Groq), um Zusammenfassungen zu erstellen und Metadaten zu extrahieren.
+- Es generiert automatisch Tags (KI, Robotik, etc.) basierend auf dem Inhalt.
+- Die Ergebnisse werden in `_student_projects/` gespeichert.
+
+## Terminkalender (F10 Campus Gummersbach)
+Das Skript `scripts/parse_appointments.py` extrahiert Termine von der TH Köln Webseite und generiert eine `.ics` Datei unter `files/f10_appointments.ics`.
 
 ---
 <div align="center">

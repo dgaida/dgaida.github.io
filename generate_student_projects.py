@@ -1,140 +1,131 @@
 import os
-import re
 import json
-from datetime import datetime
-from academic_doc_generator.core import llm_interface, pdf_processing, web_metadata
-from llm_client import LLMClient
+import requests
+from pathlib import Path
+from typing import List, Dict, Optional
+import academic_doc_generator.core.web_metadata as web_metadata
 
-# Configuration
-BASE_PATHS = ["BachelorThesen", "MasterThesen", "PraxisProjekte"]
-OUTPUT_DIR = "_student_projects"
+# Konfiguration
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+BASE_DIRS = ["BachelorThesen", "MasterThesen", "PraxisProjekte"]
+OUTPUT_DIR = Path("_student_projects")
 
-TYPE_MAPPING = {
-    "BachelorThesen": "Bachelorthesis",
-    "MasterThesen": "Masterthesis",
-    "PraxisProjekte": "Praxisprojekt"
+# Keyword Mapping für automatische Tags
+KEYWORD_TAGS = {
+    "KI": ["KI", "Künstliche Intelligenz", "Artificial Intelligence", "Neural", "Deep Learning", "Machine Learning", "LLM", "GPT"],
+    "Robotik": ["Robotik", "Robot", "Cobot", "Manipulation", "Greifer"],
+    "Web": ["Web", "Frontend", "Backend", "React", "Angular", "Vue", "JavaScript", "TypeScript", "App"],
+    "Data Science": ["Data Science", "Datenanalyse", "Visualisierung", "Big Data", "Analytics"],
+    "Software Engineering": ["Software Engineering", "Architektur", "Entwicklung", "Testing", "DevOps"],
+    "IoT": ["IoT", "Internet of Things", "Sensor", "Embedded"],
 }
 
+def extract_tags(text: str) -> List[str]:
+    """Extrahiert Tags basierend auf Keywords im Text."""
+    tags = set()
+    text_lower = text.lower()
+    for tag, keywords in KEYWORD_TAGS.items():
+        for kw in keywords:
+            if kw.lower() in text_lower:
+                tags.add(tag)
+                break
+    return sorted(list(tags))
 
-def get_semester_name(folder_name):
-    folder_name_upper = folder_name.upper()
-    # Wintersemester
-    if 'WS' in folder_name_upper:
-        # Match years like 2025_26, 25_26, 25-26
-        match = re.search(r'(\d{2,4})[_-](\d{2})', folder_name_upper)
-        if match:
-            y1, y2 = match.groups()
-            if len(y1) == 4: y1 = y1[2:]
-            return f"Wintersemester {y1}/{y2}"
-        # Match WS2526
-        match = re.search(r'WS(\d{2})(\d{2})', folder_name_upper)
-        if match:
-            y1, y2 = match.groups()
-            return f"Wintersemester {y1}/{y2}"
-        # Fallback for folder like 2025WS
-        match = re.search(r'(\d{2,4})', folder_name_upper)
-        if match:
-            y = match.group(1)
-            if len(y) == 4: y = y[2:]
-            return f"Wintersemester {y}"
-    # Sommersemester
-    if 'SOSE' in folder_name_upper or 'SS' in folder_name_upper or 'SOMMER' in folder_name_upper:
-        match = re.search(r'(\d{2,4})', folder_name_upper)
-        if match:
-            y = match.group(1)
-            if len(y) == 4: y = y[2:]
-            return f"Sommersemester {y}"
-    return folder_name
+def process_projects():
+    if not GROQ_API_KEY:
+        print("Fehler: GROQ_API_KEY nicht gesetzt.")
+        return
 
+    OUTPUT_DIR.mkdir(exist_ok=True)
 
-
-
-def process_pdf(pdf_path, llm_client):
-    print(f"Processing PDF: {pdf_path}")
-
-    # Extract plain text for metadata and summary
-    pages_text = pdf_processing.extract_text_per_page(pdf_path)
-
-    # Extract metadata
-    metadata = llm_interface.extract_document_metadata(pages_text, "German", llm_client, pdf_path=pdf_path)
-
-    # Get last modified date
-    mtime = os.path.getmtime(pdf_path)
-    date_str = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d')
-
-    return pages_text, metadata, date_str
-
-def main():
-    llm_client = LLMClient()
-
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-
-    for base_path_i in BASE_PATHS:
-        base_path = os.path.join("..", "BachelorMasterThesen", base_path_i)
-
-        if not os.path.exists(base_path):
-            print(f"Path not found: {base_path}")
+    for base_dir_name in BASE_DIRS:
+        base_path = Path(base_dir_name)
+        if not base_path.exists():
             continue
 
-        work_type = TYPE_MAPPING.get(base_path_i, "Other")
+        print(f"Verarbeite Verzeichnis: {base_dir_name}")
 
-        for semester_folder in os.listdir(base_path):
-            semester_path = os.path.join(base_path, semester_folder)
-            if not os.path.isdir(semester_path):
+        # Gehe durch Semester-Ordner
+        for semester_path in base_path.iterdir():
+            if not semester_path.is_dir():
                 continue
 
-            semester_name = get_semester_name(semester_folder)
-
-            for student_folder in os.listdir(semester_path):
-                student_path = os.path.join(semester_path, student_folder)
-                if not os.path.isdir(student_path):
+            # Gehe durch Projekt-Ordner
+            for student_path in semester_path.iterdir():
+                if not student_path.is_dir():
                     continue
 
-                # Look for JSON file
-                json_file = None
-                for f in os.listdir(student_path):
-                    if f.endswith(".json"):
-                        json_file = os.path.join(student_path, f)
-                        break
+                print(f"Verarbeite Projekt: {student_path}")
 
-                if not json_file:
+                # Finde JSON-Datei
+                json_files = list(student_path.glob("*.json"))
+                if not json_files:
                     continue
 
-                print(f"Found JSON: {json_file}")
-                with open(json_file, 'r', encoding='utf-8') as f:
+                json_file = json_files[0]
+                print(f"Gefunden: {json_file}")
+
+                with json_file.open('r', encoding='utf-8') as f:
                     try:
                         data = json.load(f)
                     except json.JSONDecodeError:
-                        print(f"Error decoding JSON: {json_file}")
+                        print(f"Fehler beim Lesen von JSON: {json_file}")
                         continue
 
-                pdf_info = data.get("pdf")
-                if not pdf_info or "filename" not in pdf_info:
-                    continue
+                # Finde PDF-Datei
+                pdf_files = list(student_path.glob("*.pdf"))
+                pdf_path = pdf_files[0] if pdf_files else None
 
-                pdf_filename = pdf_info["filename"]
-                pdf_path = os.path.join(student_path, pdf_filename)
+                # Metadaten vorbereiten
+                author = data.get("author", "Unbekannt")
+                title = data.get("title", "Kein Titel")
+                date = data.get("date", "")
 
-                if not os.path.exists(pdf_path):
-                    print(f"PDF not found: {pdf_path}")
-                    continue
+                # Typ basierend auf Ordnerstruktur
+                project_type = base_dir_name[:-2] if base_dir_name.endswith("en") else base_dir_name
+                if project_type == "PraxisProjekte": project_type = "Praxisprojekt"
 
-                pages_text, metadata, date_str = process_pdf(pdf_path, llm_client)
+                semester = semester_path.name
 
-                # Generate web metadata file using the library method
-                md_path = web_metadata.generate_web_metadata_file(
-                    output_folder=OUTPUT_DIR,
-                    title=metadata.get("title", "Unknown Title"),
-                    author=metadata.get("author", "Unknown Author"),
-                    pages_text=pages_text,
-                    llm_client=llm_client,
-                    work_type=work_type,
-                    semester=semester_name,
-                    date_str=date_str
-                )
-                print(f"Generated: {md_path}")
+                # Tags extrahieren
+                tags = extract_tags(title + " " + data.get("abstract", ""))
 
+                # Generiere Web-Metadaten (dies nutzt die academic_doc_generator Lib)
+                # Die Lib schreibt die Datei direkt
+                try:
+                    # Wir nutzen die Lib-Funktion, müssen aber evtl. Tags danach einfügen
+                    # da die Standard-Lib diese vielleicht nicht unterstützt.
+                    md_file_path = web_metadata.generate_web_metadata_file(
+                        author=author,
+                        title=title,
+                        date=date,
+                        abstract=data.get("abstract", ""),
+                        type=project_type,
+                        semester=semester,
+                        output_dir=str(OUTPUT_DIR)
+                    )
+
+                    # Post-Processing: Tags in Frontmatter einfügen
+                    if md_file_path and os.path.exists(md_file_path) and tags:
+                        with open(md_file_path, 'r', encoding='utf-8') as f:
+                            lines = f.readlines()
+
+                        # Suche nach dem zweiten ---
+                        dash_count = 0
+                        new_lines = []
+                        for line in lines:
+                            new_lines.append(line)
+                            if line.strip() == "---":
+                                dash_count += 1
+                                if dash_count == 1:
+                                    # Füge Tags nach dem ersten --- ein
+                                    new_lines.append(f"tags: {json.dumps(tags)}\n")
+
+                        with open(md_file_path, 'w', encoding='utf-8') as f:
+                            f.writelines(new_lines)
+
+                except Exception as e:
+                    print(f"Fehler bei Generierung für {author}: {e}")
 
 if __name__ == "__main__":
-    main()
+    process_projects()
