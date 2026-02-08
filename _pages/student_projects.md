@@ -7,7 +7,111 @@ header:
   teaser: /assets/images/student_projects_teaser.jpg
 ---
 
-Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und Masterthesen sowie Praxisprojekte, die von mir betreut wurden.
+Auf dieser Seite finden Sie eine Übersicht über verfügbare Themen sowie abgeschlossene Bachelor- und Masterthesen und Praxisprojekte, die von mir betreut wurden.
+
+{% assign projects = site.student_projects | sort: 'date' | reverse %}
+
+## Verfügbare Themen
+
+Themen für Abschluss- und Projektarbeiten finden Sie in [PROX](https://prox.innovation-hub.de/projects?q=dgaida&state=PROPOSED&state=OFFERED).
+
+## Abgeschlossene Arbeiten
+
+<details style="cursor: pointer; margin-bottom: 20px;">
+  <summary><h3 style="display: inline;">Timeline anzeigen</h3> (Chronologische Übersicht der letzten Arbeiten)</summary>
+  <div class="timeline">
+    {% for project in projects limit:6 %}
+      <div class="timeline-container {% cycle 'left', 'right' %}">
+        <div class="timeline-content">
+          <small>{{ project.date | date: "%B %Y" }}</small>
+          <h3 style="margin: 5px 0;">{{ project.title }}</h3>
+          <p style="margin: 0;">{{ project.author_initials }} - {{ project.type }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</details>
+
+## Statistik
+
+<div class="stats-container">
+  <div class="stat-item">
+    <h3>Nach Typ:</h3>
+    {% assign stat_types = projects | map: 'type' | uniq | compact | sort %}
+    {% for type in stat_types %}
+      <span style="font-size: 0.9em;">{{ type }}: {{ projects | where: "type", type | size }}</span><br>
+    {% endfor %}
+  </div>
+  <div class="stat-item">
+    <h3>Nach Semester:</h3>
+    {% assign stat_semesters = projects | map: 'semester' | uniq | compact | sort | reverse %}
+    {% for sem in stat_semesters %}
+      <span style="font-size: 0.9em;">{{ sem }}: {{ projects | where: "semester", sem | size }}</span><br>
+    {% endfor %}
+  </div>
+  <div class="stat-item">
+    <h3>Gesamt:</h3>
+    <p>{{ projects | size }} Projekte</p>
+  </div>
+</div>
+
+<div class="project-filters">
+  <input type="text" id="project-search" placeholder="Suche nach Titeln..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
+  <div class="filter-group">
+    <select id="type-filter">
+      <option value="">Alle Typen</option>
+      {% assign types = projects | map: 'type' | uniq %}
+      {% assign types_sorted = types | compact | sort %}
+      {% for type in types_sorted %}<option value="{{ type }}">{{ type }}</option>{% endfor %}
+    </select>
+    <select id="semester-filter">
+      <option value="">Alle Semester</option>
+      {% assign semesters = projects | map: 'semester' | uniq %}
+      {% assign semesters_sorted = semesters | compact | sort | reverse %}
+      {% for sem in semesters_sorted %}<option value="{{ sem }}">{{ sem }}</option>{% endfor %}
+    </select>
+    <select id="tag-filter">
+      <option value="">Alle Themen</option>
+      {% assign all_tags = "" | split: "," %}
+      {% for project in projects %}
+        {% if project.tags %}
+          {% for tag in project.tags %}
+            {% assign all_tags = all_tags | push: tag %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+      {% assign all_tags_sorted = all_tags | uniq | compact | sort %}
+      {% for tag in all_tags_sorted %}
+        {% if tag != "" %}
+          <option value="{{ tag }}">{{ tag }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+{% assign types_list = projects | map: 'type' | uniq | compact | sort %}
+{% for project_type in types_list %}
+
+<h3 id="{{ project_type | slugify }}">{{ project_type }}</h3>
+
+{% assign type_projects = projects | where: "type", project_type %}
+{% assign semester_groups = type_projects | map: 'semester' | uniq | compact | sort | reverse %}
+
+{% for sem in semester_groups %}
+
+<h4 style="color: #666;">{{ sem }}</h4>
+
+<div class="entries-{{ project_type | slugify }}">
+{% for post in type_projects %}
+{% if post.semester == sem %}
+{% include archive-single.html hide_details=true %}
+{% endif %}
+{% endfor %}
+</div>
+
+{% endfor %}
+{% endfor %}
 
 <style>
 /* Timeline Styles */
@@ -101,104 +205,5 @@ Auf dieser Seite finden Sie eine Übersicht über abgeschlossene Bachelor- und M
 .stat-item h3 { margin: 0; font-size: 1.2em; }
 .stat-item p { margin: 5px 0 0; font-weight: bold; font-size: 1.5em; color: var(--global-text-color, #333); }
 </style>
-
-{% assign projects = site.student_projects | sort: 'date' | reverse %}
-
-## Timeline
-
-<div class="timeline">
-  {% for project in projects limit:6 %}
-    <div class="timeline-container {% cycle 'left', 'right' %}">
-      <div class="timeline-content">
-        <small>{{ project.date | date: "%B %Y" }}</small>
-        <h3 style="margin: 5px 0;">{{ project.title }}</h3>
-        <p style="margin: 0;">{{ project.author_initials }} - {{ project.type }}</p>
-      </div>
-    </div>
-  {% endfor %}
-</div>
-
-## Statistik
-
-<div class="stats-container">
-  <div class="stat-item">
-    <h3>Nach Typ:</h3>
-    {% assign stat_types = projects | map: 'type' | uniq | compact | sort %}
-    {% for type in stat_types %}
-      <span style="font-size: 0.9em;">{{ type }}: {{ projects | where: "type", type | size }}</span><br>
-    {% endfor %}
-  </div>
-  <div class="stat-item">
-    <h3>Nach Semester:</h3>
-    {% assign stat_semesters = projects | map: 'semester' | uniq | compact | sort | reverse %}
-    {% for sem in stat_semesters %}
-      <span style="font-size: 0.9em;">{{ sem }}: {{ projects | where: "semester", sem | size }}</span><br>
-    {% endfor %}
-  </div>
-  <div class="stat-item">
-    <h3>Gesamt:</h3>
-    <p>{{ projects | size }} Projekte</p>
-  </div>
-</div>
-
-## Abgeschlossene Arbeiten
-
-<div class="project-filters">
-  <input type="text" id="project-search" placeholder="Suche nach Titeln..." style="width: 100%; padding: 10px; margin-bottom: 10px;">
-  <div class="filter-group">
-    <select id="type-filter">
-      <option value="">Alle Typen</option>
-      {% assign types = projects | map: 'type' | uniq %}
-      {% assign types_sorted = types | compact | sort %}
-      {% for type in types_sorted %}<option value="{{ type }}">{{ type }}</option>{% endfor %}
-    </select>
-    <select id="semester-filter">
-      <option value="">Alle Semester</option>
-      {% assign semesters = projects | map: 'semester' | uniq %}
-      {% assign semesters_sorted = semesters | compact | sort | reverse %}
-      {% for sem in semesters_sorted %}<option value="{{ sem }}">{{ sem }}</option>{% endfor %}
-    </select>
-    <select id="tag-filter">
-      <option value="">Alle Themen</option>
-      {% assign all_tags = "" | split: "," %}
-      {% for project in projects %}
-        {% if project.tags %}
-          {% for tag in project.tags %}
-            {% assign all_tags = all_tags | push: tag %}
-          {% endfor %}
-        {% endif %}
-      {% endfor %}
-      {% assign all_tags_sorted = all_tags | uniq | compact | sort %}
-      {% for tag in all_tags_sorted %}
-        {% if tag != "" %}
-          <option value="{{ tag }}">{{ tag }}</option>
-        {% endif %}
-      {% endfor %}
-    </select>
-  </div>
-</div>
-
-{% assign types_list = projects | map: 'type' | uniq | compact | sort %}
-{% for project_type in types_list %}
-
-<h3 id="{{ project_type | slugify }}">{{ project_type }}</h3>
-
-{% assign type_projects = projects | where: "type", project_type %}
-{% assign semester_groups = type_projects | map: 'semester' | uniq | compact | sort | reverse %}
-
-{% for sem in semester_groups %}
-
-<h4 style="color: #666;">{{ sem }}</h4>
-
-<div class="entries-{{ project_type | slugify }}">
-{% for post in type_projects %}
-{% if post.semester == sem %}
-{% include archive-single.html hide_details=true %}
-{% endif %}
-{% endfor %}
-</div>
-
-{% endfor %}
-{% endfor %}
 
 <script src="{{ '/assets/js/filter-projects.js' | relative_url }}"></script>
