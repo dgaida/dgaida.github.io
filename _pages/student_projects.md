@@ -26,7 +26,7 @@ Die Bewertung von Projekt- und Abschlussarbeiten erfolgt anhand der folgenden Kr
 | **Methodik & Vorgehen** | Auswahl und Begründung von Methoden, z. B. agile Entwicklung, Modellierung, Experimente, Evaluation |
 | **Technische Umsetzung & Ergebnisse** | Qualität der Implementierung, Systemarchitektur, Softwarequalität, Datenanalyse, [Code Dokumentation](https://google.github.io/styleguide/), etc. |
 | **Kritische Reflexion & Bewertung** | Eigene Ergebnisse werden hinterfragt, Limitationen erkannt, alternative Ansätze diskutiert |
-| **Wissenschaftliches Arbeiten & Literatur** | Umgang mit Quellen, Zitierweise, wissenschaftlicher Stil, Qualität der Literaturrecherche |
+| **Wissenschaftliches Arbeiten & Literatur** | Umgang mit Quellen, Zitierweise, wissenschaftlicher Stil, Qualität der [Literaturrecherche](https://scholar.google.de/) |
 | **Struktur, Sprache & Verständlichkeit** | Aufbau der Arbeit, Lesbarkeit, Klarheit der Darstellung, Fachsprache |
 | **Selbstständigkeit & Originalität** | Eigenanteil, kreative Ansätze, Initiative bei der Umsetzung |
 
