@@ -15,6 +15,21 @@ Auf dieser Seite finden Sie eine Übersicht über verfügbare Themen sowie abges
 
 Themen für Abschluss- und Projektarbeiten finden Sie in [PROX](https://prox.innovation-hub.de/projects?q=dgaida&state=PROPOSED&state=OFFERED).
 
+## Bewertungskriterien für studentische Arbeiten
+
+Die Bewertung von Projekt- und Abschlussarbeiten erfolgt anhand der folgenden Kriterien. Diese dienen als Orientierungshilfe für eine erfolgreiche Bearbeitung und machen die Benotung transparent.
+
+| Kriterium | Beschreibung |
+| :--- | :--- |
+| **Problemdefinition & Zielsetzung** | Klare Formulierung und Abgrenzung des Problems, Zielstellung der Arbeit, Forschungsfrage(n) |
+| **Fachliche Tiefe & Informatikbezug** | Anwendung informatischer Konzepte, Theorien, Algorithmen, Architektur, Modellierung etc. |
+| **Methodik & Vorgehen** | Auswahl und Begründung von Methoden, z. B. agile Entwicklung, Modellierung, Experimente, Evaluation |
+| **Technische Umsetzung & Ergebnisse** | Qualität der Implementierung, Systemarchitektur, Softwarequalität, Datenanalyse, [Code Dokumentation](https://google.github.io/styleguide/), etc. |
+| **Kritische Reflexion & Bewertung** | Eigene Ergebnisse werden hinterfragt, Limitationen erkannt, alternative Ansätze diskutiert |
+| **Wissenschaftliches Arbeiten & Literatur** | Umgang mit Quellen, Zitierweise, wissenschaftlicher Stil, Qualität der Literaturrecherche |
+| **Struktur, Sprache & Verständlichkeit** | Aufbau der Arbeit, Lesbarkeit, Klarheit der Darstellung, Fachsprache |
+| **Selbstständigkeit & Originalität** | Eigenanteil, kreative Ansätze, Initiative bei der Umsetzung |
+
 ## Abgeschlossene Arbeiten
 
 <details style="cursor: pointer; margin-bottom: 20px;">
