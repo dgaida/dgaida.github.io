@@ -38,13 +38,16 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
       - name: Send mail
-        if: steps.commit_step.outputs.changed == 'true'
-        uses: dawidd6/action-send-mail@v3
+        if: |
+          steps.commit_step.outputs.changed == 'true' &&
+          (secrets.MAIL_SERVER != '' || secrets.SMTP_SERVER != '')
+        uses: dawidd6/action-send-mail@v4
         with:
-          server_address: ${{secrets.MAIL_SERVER}}
-          server_port: ${{secrets.MAIL_PORT}}
-          username: ${{secrets.MAIL_USERNAME}}
-          password: ${{secrets.MAIL_PASSWORD}}
+          # Use both common naming conventions for secrets as fallbacks
+          server_address: ${{ secrets.MAIL_SERVER || secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT || secrets.SMTP_PORT || 587 }}
+          username: ${{ secrets.MAIL_USERNAME || secrets.SMTP_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD || secrets.SMTP_PASSWORD }}
           subject: Appointments Updated
           body: |
             The appointments ICS file (files/f10_appointments.ics) has been updated in the repository dgaida/dgaida.github.io.
