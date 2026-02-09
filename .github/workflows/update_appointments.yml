@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      MAIL_SERVER: ${{ secrets.MAIL_SERVER || secrets.SMTP_SERVER }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -38,13 +40,11 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
       - name: Send mail
-        if: |
-          steps.commit_step.outputs.changed == 'true' &&
-          (secrets.MAIL_SERVER != '' || secrets.SMTP_SERVER != '')
+        if: steps.commit_step.outputs.changed == 'true' && env.MAIL_SERVER != ''
         uses: dawidd6/action-send-mail@v4
         with:
-          # Use both common naming conventions for secrets as fallbacks
-          server_address: ${{ secrets.MAIL_SERVER || secrets.SMTP_SERVER }}
+          # Use the environment variable for server_address
+          server_address: ${{ env.MAIL_SERVER }}
           server_port: ${{ secrets.MAIL_PORT || secrets.SMTP_PORT || 587 }}
           username: ${{ secrets.MAIL_USERNAME || secrets.SMTP_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD || secrets.SMTP_PASSWORD }}
