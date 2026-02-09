@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: '0 0 28 2 *'
     - cron: '0 0 31 8 *'
+    - cron: '0 0 1 * *'
   workflow_dispatch:
 
 jobs:
@@ -23,6 +24,7 @@ jobs:
       - name: Run script
         run: python scripts/parse_appointments.py
       - name: Commit and push if changed
+        id: commit_step
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -30,6 +32,23 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "Update appointments ICS file"
             git push
+            echo "changed=true" >> $GITHUB_OUTPUT
           else
             echo "No changes to commit"
+            echo "changed=false" >> $GITHUB_OUTPUT
           fi
+      - name: Send mail
+        if: steps.commit_step.outputs.changed == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{secrets.MAIL_SERVER}}
+          server_port: ${{secrets.MAIL_PORT}}
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: Appointments Updated
+          body: |
+            The appointments ICS file (files/f10_appointments.ics) has been updated in the repository dgaida/dgaida.github.io.
+
+            Please check the changes at: https://github.com/dgaida/dgaida.github.io/blob/master/files/f10_appointments.ics
+          to: daniel.gaida@th-koeln.de
+          from: GitHub Actions <action@github.com>
