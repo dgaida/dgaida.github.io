@@ -2,13 +2,14 @@
 
 ## Wintersemester 2026/27
 
-Anzahl Vorlesungswochen: 17
+Anzahl Vorlesungswochen: 14
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
 | 1 | Mo 28.09.2026 - Fr 02.10.2026 |  |  |
-| 2 | Mo 16.11.2026 - Fr 20.11.2026 |  |  |
-| 3 | Fr 05.02.2027 - Fr 12.02.2027 | 08.02. (Rosenmontag) | Karnevalswoche |
+| 2 | Mo 05.10.2026 - Fr 09.10.2026 |  |  |
+| 3 | Mo 16.11.2026 - Fr 20.11.2026 |  |  |
+| 4 | Fr 05.02.2027 - Fr 12.02.2027 | 08.02. (Rosenmontag) | Karnevalswoche |
 
 ## Sommersemester 2027
 
@@ -22,10 +23,11 @@ Anzahl Vorlesungswochen: 13
 
 ## Wintersemester 2027/28
 
-Anzahl Vorlesungswochen: 17
+Anzahl Vorlesungswochen: 15
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
 | 1 | Mo 27.09.2027 - Fr 01.10.2027 |  |  |
-| 2 | Mo 22.11.2027 - Fr 26.11.2027 |  |  |
-| 3 | Mo 07.02.2028 - Fr 11.02.2028 |  |  |
+| 2 | Mo 04.10.2027 - Fr 08.10.2027 |  |  |
+| 3 | Mo 22.11.2027 - Fr 26.11.2027 |  |  |
+| 4 | Mo 07.02.2028 - Fr 11.02.2028 |  |  |
