@@ -35,8 +35,10 @@ Die Prüfungszeiträume werden pro Semester nach folgendem Schema festgelegt:
 
 ## Automatische Anpassung (Optimierung)
 Sollten die Standard-Termine (basierend auf dem Vorlesungsbeginn/-ende) die 7-Wochen-Buffer verletzen, verschiebt das Skript:
-- Den Beginn (P1) nach vorne, um den Buffer vor der HIP-Woche zu vergrößern.
-- Das Ende (P3) nach hinten, um den Buffer nach der HIP-Woche zu vergrößern.
+- Den Beginn (P1) nach vorne (maximal eine Woche vor Vorlesungsbeginn), um den Buffer vor der HIP-Woche zu vergrößern.
+- Das Ende (P3) nach hinten (maximal eine Woche nach Vorlesungsende), um den Buffer nach der HIP-Woche zu vergrößern.
+
+Dabei gilt die **"No-Gap"-Regel**: Prüfungszeiträume, die außerhalb der offiziellen Vorlesungszeit liegen, müssen unmittelbar an diese angrenzen. Es werden keine "Lückenwochen" zwischen Prüfung und Vorlesung eingeplant. Wenn der 7-Wochen-Buffer auch durch diese Verschiebung nicht erreicht wird, wird der kürzere Buffer akzeptiert und eine Warnung ausgegeben.
 
 Falls keine Lösung gefunden wird, die alle Bedingungen gleichzeitig erfüllt, werden mehrere Varianten (z. B. "Standard" vs. "Optimierungsversuch") ausgegeben und die jeweils verletzten Bedingungen markiert.
 

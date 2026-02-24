@@ -257,22 +257,31 @@ def main():
         # Find best plan by shifting
         p_mons_best = list(p_mons_std)
 
-        # Calculate needed shift for P1
+        # Rule: If buffer before HIP < 7, try shifting P1 back to immediately before lecture start
+        # This is always exactly one shift from the original p1_mon (first week of lectures)
         stats_std = calculate_stats(p_mons_std, is_ws)
         if stats_std['w_before'] < 7:
-            weeks_to_shift = 7 - stats_std['w_before']
+            # Shift back by 1 block (1 week for SS, 2 weeks for WS)
             num_start = 2 if is_ws else 1
+            shifted_p_mons = list(p_mons_std)
+            # We base the shift on p1_mon (the original lecture start week)
             for i in range(num_start):
-                p_mons_best[i] -= timedelta(weeks=weeks_to_shift)
+                shifted_p_mons[i] = p1_mon - timedelta(weeks=num_start) + (timedelta(weeks=i) if is_ws else timedelta(0))
 
-        # Calculate needed shift for P3
-        stats_best_temp = calculate_stats(p_mons_best, is_ws)
-        if stats_best_temp['w_after'] < 7:
-            weeks_to_shift = 7 - stats_best_temp['w_after']
-            p_mons_best[-1] += timedelta(weeks=weeks_to_shift)
+            # Re-check Easter for the shifted P1
+            # If any of the new weeks is Easter week, we shouldn't use this shift (or shift further, but user said no gaps)
+            if not any(is_easter_week(shifted_p_mons[i]) for i in range(num_start)):
+                p_mons_best = shifted_p_mons
 
-        # Apply Easter rule to the shifted plan
-        p_mons_best = apply_easter_rule(p_mons_best, is_ws)
+        # Rule: If buffer after HIP < 7, try shifting P3 forward to immediately after lecture end
+        # This is always exactly 1 week after the original p3_mon
+        stats_temp = calculate_stats(p_mons_best, is_ws)
+        if stats_temp['w_after'] < 7:
+            shifted_p_mons = list(p_mons_best)
+            shifted_p_mons[-1] = p3_mon + timedelta(weeks=1)
+            # Re-check Easter for the shifted P3
+            if not is_easter_week(shifted_p_mons[-1]):
+                p_mons_best = shifted_p_mons
 
         plans = []
         stats_std = calculate_stats(p_mons_std, is_ws)
@@ -340,7 +349,16 @@ def main():
 
             for r in res:
                 hol_str = ", ".join([f"{h[0].strftime('%d.%m.')} ({h[1]})" for h in r['holidays']])
-                note = "Karnevalswoche" if r['is_karneval'] else ""
+                notes = []
+                if r['is_karneval']: notes.append("Karnevalswoche")
+
+                # Check buffer violations for this plan
+                if r['week_num'] == (2 if is_ws else 1) and stats['w_before'] < 7:
+                    notes.append(f"Warnung: Puffer vor HIP nur {stats['w_before']} Wochen")
+                if r['week_num'] == len(current_plan_mons) and stats['w_after'] < 7:
+                    notes.append(f"Warnung: Puffer nach HIP nur {stats['w_after']} Wochen")
+
+                note = "; ".join(notes)
                 s_wd = WDAYS[r['start'].weekday()]
                 e_wd = WDAYS[r['end'].weekday()]
                 output_md += f"| {r['week_num']} | {s_wd} {r['start'].strftime('%d.%m.%Y')} - {e_wd} {r['end'].strftime('%d.%m.%Y')} | {hol_str} | {note} |\n"
