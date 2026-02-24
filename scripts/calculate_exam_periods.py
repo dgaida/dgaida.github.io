@@ -47,6 +47,12 @@ def get_weiberfastnacht(year):
 def get_working_days_in_week(monday):
     return [monday + timedelta(days=i) for i in range(5)]
 
+def is_easter_week(monday):
+    # Week in which Easter Monday lies
+    easter_monday = easter.easter(monday.year) + timedelta(days=1)
+    em_monday = easter_monday - timedelta(days=easter_monday.weekday())
+    return monday == em_monday
+
 def get_exam_days(monday, nh):
     target_days = get_working_days_in_week(monday)
     holiday_count = 0
@@ -182,16 +188,31 @@ def main():
         # Determine standard P1, P2, P3
         # P1: first week of lectures
         p1_mon = l_start - timedelta(days=l_start.weekday())
-
         # P2: HIP week
         p2_mon = hip_start - timedelta(days=hip_start.weekday())
-
         # P3: last week of lectures
         p3_mon = l_end - timedelta(days=l_end.weekday())
 
-        # Calculate lecture weeks
-        total_weeks = ((p3_mon - p1_mon).days // 7) + 1
-        lecture_weeks = total_weeks - 3 # excluding the 3 exam weeks
+        def calculate_lecture_weeks(p1, p3):
+            total_w = ((p3 - p1).days // 7) + 1
+            return total_w - 3
+
+        # Easter Rule: if any exam week is Easter week, shift it 1 week later if W >= 13
+        p_mons = [p1_mon, p2_mon, p3_mon]
+        for i in range(3):
+            if is_easter_week(p_mons[i]):
+                # Try shifting
+                orig_p1, orig_p3 = p_mons[0], p_mons[2]
+                temp_mons = list(p_mons)
+                temp_mons[i] += timedelta(days=7)
+                new_w = calculate_lecture_weeks(temp_mons[0], temp_mons[2])
+                if new_w >= 13:
+                    p_mons = temp_mons
+                    # Update local mons
+                    p1_mon, p2_mon, p3_mon = p_mons
+                break
+
+        lecture_weeks = calculate_lecture_weeks(p1_mon, p3_mon)
 
         warning = ""
         alternative_plan = None
@@ -201,6 +222,7 @@ def main():
             alt_p1_mon = p1_mon - timedelta(days=7)
             alternative_plan = alt_p1_mon
 
+        WDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
         def process_plan(p1_m, p2_m, p3_m):
             results = []
             for i, mon in enumerate([p1_m, p2_m, p3_m]):
@@ -240,13 +262,16 @@ def main():
 
             res = process_plan(p1_m, p2_mon, p3_mon)
 
+            output_md += f"Anzahl Vorlesungswochen: {calculate_lecture_weeks(p1_m, p3_mon)}\n\n"
             output_md += "| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |\n"
             output_md += "| --- | --- | --- | --- |\n"
 
             for r in res:
                 hol_str = ", ".join([f"{h[0].strftime('%d.%m.')} ({h[1]})" for h in r['holidays']])
                 note = "Karnevalswoche" if r['is_karneval'] else ""
-                output_md += f"| {r['week_num']} | {r['start'].strftime('%d.%m.%Y')} - {r['end'].strftime('%d.%m.%Y')} | {hol_str} | {note} |\n"
+                s_wd = WDAYS[r['start'].weekday()]
+                e_wd = WDAYS[r['end'].weekday()]
+                output_md += f"| {r['week_num']} | {s_wd} {r['start'].strftime('%d.%m.%Y')} - {e_wd} {r['end'].strftime('%d.%m.%Y')} | {hol_str} | {note} |\n"
 
             output_md += "\n"
 
