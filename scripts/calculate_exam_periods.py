@@ -203,38 +203,90 @@ def main():
         p2_mon = hip_start - timedelta(days=hip_start.weekday())
         p3_mon = l_end - timedelta(days=l_end.weekday())
 
-        def calculate_lecture_weeks(p_list, is_winter):
+        def calculate_stats(p_list, is_winter):
             p_start = p_list[0]
+            p_hip = p_list[-2]
+            p_p1_end = p_list[1] if is_winter else p_list[0]
             p_stop = p_list[-1]
+
             total_w = ((p_stop - p_start).days // 7) + 1
-            exam_w = 4 if is_winter else 3
+            exam_w = len(p_list)
             h_w = get_ws_holiday_weeks(p_start, p_stop) if is_winter else 0
-            return total_w - exam_w - h_w
+            lecture_w = total_w - exam_w - h_w
+
+            # Buffers
+            w_before = ((p_hip - p_p1_end).days // 7) - 1
+            if is_winter:
+                w_before -= get_ws_holiday_weeks(p_p1_end + timedelta(days=7), p_hip - timedelta(days=7))
+
+            w_after = ((p_stop - p_hip).days // 7) - 1
+            if is_winter:
+                w_after -= get_ws_holiday_weeks(p_hip + timedelta(days=7), p_stop - timedelta(days=7))
+
+            return {
+                'lecture_weeks': lecture_w,
+                'w_before': w_before,
+                'w_after': w_after,
+                'total_weeks': total_w
+            }
 
         # Initial p_mons: WS has 2 start weeks
         if is_ws:
-            p_mons = [p1_mon, p1_mon + timedelta(days=7), p2_mon, p3_mon]
+            p_mons_std = [p1_mon, p1_mon + timedelta(days=7), p2_mon, p3_mon]
         else:
-            p_mons = [p1_mon, p2_mon, p3_mon]
+            p_mons_std = [p1_mon, p2_mon, p3_mon]
 
-        # Easter Rule: if any exam week is Easter week, shift it 1 week later if W >= 13
-        for i in range(len(p_mons)):
-            if is_easter_week(p_mons[i]):
-                temp_mons = list(p_mons)
-                temp_mons[i] += timedelta(days=7)
-                if calculate_lecture_weeks(temp_mons, is_ws) >= 13:
-                    p_mons = temp_mons
-                break
+        def apply_easter_rule(p_list, is_winter):
+            for i in range(len(p_list)):
+                if is_easter_week(p_list[i]):
+                    temp = list(p_list)
+                    temp[i] += timedelta(days=7)
+                    if calculate_stats(temp, is_winter)['lecture_weeks'] >= 13:
+                        return temp
+            return p_list
 
-        lecture_weeks = calculate_lecture_weeks(p_mons, is_ws)
+        p_mons_std = apply_easter_rule(p_mons_std, is_ws)
 
-        warning = ""
-        alternative_plan = None
-        if lecture_weeks < 13:
-            warning = f"**WARNUNG: Nur {lecture_weeks} Vorlesungswochen!**"
-            # Alternative P1: shift the whole block starting at p1 back by 1 week
-            alt_p1_start = p_mons[0] - timedelta(days=7)
-            alternative_plan = alt_p1_start
+        def get_violations(stats):
+            v = []
+            if stats['lecture_weeks'] < 13: v.append(f"Vorlesungswochen < 13 ({stats['lecture_weeks']})")
+            if stats['w_before'] < 7: v.append(f"Wochen vor HIP < 7 ({stats['w_before']})")
+            if stats['w_after'] < 7: v.append(f"Wochen nach HIP < 7 ({stats['w_after']})")
+            return v
+
+        # Find best plan by shifting
+        p_mons_best = list(p_mons_std)
+
+        # Calculate needed shift for P1
+        stats_std = calculate_stats(p_mons_std, is_ws)
+        if stats_std['w_before'] < 7:
+            weeks_to_shift = 7 - stats_std['w_before']
+            num_start = 2 if is_ws else 1
+            for i in range(num_start):
+                p_mons_best[i] -= timedelta(weeks=weeks_to_shift)
+
+        # Calculate needed shift for P3
+        stats_best_temp = calculate_stats(p_mons_best, is_ws)
+        if stats_best_temp['w_after'] < 7:
+            weeks_to_shift = 7 - stats_best_temp['w_after']
+            p_mons_best[-1] += timedelta(weeks=weeks_to_shift)
+
+        # Apply Easter rule to the shifted plan
+        p_mons_best = apply_easter_rule(p_mons_best, is_ws)
+
+        plans = []
+        stats_std = calculate_stats(p_mons_std, is_ws)
+        v_std = get_violations(stats_std)
+
+        stats_best = calculate_stats(p_mons_best, is_ws)
+        v_best = get_violations(stats_best)
+
+        if not v_best:
+            plans.append(("Vorschlag", p_mons_best))
+        else:
+            plans.append(("Standard", p_mons_std))
+            if p_mons_best != p_mons_std:
+                plans.append(("Optimierungsversuch", p_mons_best))
 
         WDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
         def process_plan(p_list):
@@ -262,29 +314,27 @@ def main():
                 })
             return results
 
-        plans = [("Standard", p1_mon)]
-        if alternative_plan:
-            plans.append(("Alternativ (vorgezogen)", alternative_plan))
-
         output_md += f"## {sem}\n\n"
-        if warning:
-            output_md += f"{warning}\n\n"
 
-        for plan_name, start_mon in plans:
+        for plan_name, current_plan_mons in plans:
+            stats = calculate_stats(current_plan_mons, is_ws)
+            v = get_violations(stats)
+
             if len(plans) > 1:
                 output_md += f"### Plan: {plan_name}\n\n"
 
-            if plan_name == "Standard":
-                current_plan_mons = p_mons
-            else:
-                # Alternative plan: shift the start week(s) back
-                diff = start_mon - p_mons[0]
-                num_start_weeks = 2 if is_ws else 1
-                current_plan_mons = [m + diff if j < num_start_weeks else m for j, m in enumerate(p_mons)]
+            if v:
+                output_md += "**VERLETZTE BEDINGUNGEN:**\n"
+                for vi in v:
+                    output_md += f"- {vi}\n"
+                output_md += "\n"
 
             res = process_plan(current_plan_mons)
 
-            output_md += f"Anzahl Vorlesungswochen: {calculate_lecture_weeks(current_plan_mons, is_ws)}\n\n"
+            output_md += f"Anzahl Vorlesungswochen: {stats['lecture_weeks']}\n"
+            output_md += f"Vorlesungswochen vor HIP: {stats['w_before']}\n"
+            output_md += f"Vorlesungswochen nach HIP: {stats['w_after']}\n\n"
+
             output_md += "| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |\n"
             output_md += "| --- | --- | --- | --- |\n"
 
