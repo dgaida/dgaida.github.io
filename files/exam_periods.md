@@ -47,13 +47,13 @@ Vorlesungswochen nach HIP: 9
 
 ## Wintersemester 2027/28
 
-Anzahl Vorlesungswochen: 17
-Vorlesungswochen vor HIP: 8
+Anzahl Vorlesungswochen: 16
+Vorlesungswochen vor HIP: 7
 Vorlesungswochen nach HIP: 9
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
-| 1 | Mo 13.09.2027 - Fr 17.09.2027 |  |  |
-| 2 | Mo 20.09.2027 - Fr 24.09.2027 |  |  |
+| 1 | Mo 20.09.2027 - Fr 24.09.2027 |  |  |
+| 2 | Mo 27.09.2027 - Fr 01.10.2027 |  |  |
 | 3 | Mo 22.11.2027 - Fr 26.11.2027 |  |  |
 | 4 | Mo 07.02.2028 - Fr 11.02.2028 |  |  |

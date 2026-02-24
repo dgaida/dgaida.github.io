@@ -247,48 +247,68 @@ def main():
 
         p_mons_std = apply_easter_rule(p_mons_std, is_ws)
 
-        def get_violations(stats):
+        def get_violations(stats, p_list):
             v = []
             if stats['lecture_weeks'] < 13: v.append(f"Vorlesungswochen < 13 ({stats['lecture_weeks']})")
             if stats['w_before'] < 7: v.append(f"Wochen vor HIP < 7 ({stats['w_before']})")
             if stats['w_after'] < 7: v.append(f"Wochen nach HIP < 7 ({stats['w_after']})")
+            if any(is_easter_week(m) for m in p_list): v.append("Prüfung in Osterwoche")
             return v
 
-        # Find best plan by shifting
-        p_mons_best = list(p_mons_std)
-
-        # Rule: If buffer before HIP < 7, try shifting P1 back to immediately before lecture start
-        # This is always exactly one shift from the original p1_mon (first week of lectures)
-        stats_std = calculate_stats(p_mons_std, is_ws)
-        if stats_std['w_before'] < 7:
-            # Shift back by 1 block (1 week for SS, 2 weeks for WS)
-            num_start = 2 if is_ws else 1
-            shifted_p_mons = list(p_mons_std)
-            # We base the shift on p1_mon (the original lecture start week)
+        # Find best plan by exploring No-Gap options
+        num_start = 2 if is_ws else 1
+        p1_options = []
+        for s in range(num_start + 1): # 0, 1, (2 for WS)
+            opt = []
             for i in range(num_start):
-                shifted_p_mons[i] = p1_mon - timedelta(weeks=num_start) + (timedelta(weeks=i) if is_ws else timedelta(0))
+                opt.append(p1_mon - timedelta(weeks=s) + timedelta(weeks=i))
+            p1_options.append(opt)
 
-            # Re-check Easter for the shifted P1
-            # If any of the new weeks is Easter week, we shouldn't use this shift (or shift further, but user said no gaps)
-            if not any(is_easter_week(shifted_p_mons[i]) for i in range(num_start)):
-                p_mons_best = shifted_p_mons
+        p3_options = [p3_mon, p3_mon + timedelta(weeks=1)]
 
-        # Rule: If buffer after HIP < 7, try shifting P3 forward to immediately after lecture end
-        # This is always exactly 1 week after the original p3_mon
-        stats_temp = calculate_stats(p_mons_best, is_ws)
-        if stats_temp['w_after'] < 7:
-            shifted_p_mons = list(p_mons_best)
-            shifted_p_mons[-1] = p3_mon + timedelta(weeks=1)
-            # Re-check Easter for the shifted P3
-            if not is_easter_week(shifted_p_mons[-1]):
-                p_mons_best = shifted_p_mons
+        best_p_mons = None
+        best_score = 999
 
+        for p1_opt in p1_options:
+            for p3_opt in p3_options:
+                candidate = p1_opt + [p2_mon, p3_opt]
+                stats = calculate_stats(candidate, is_ws)
+                violations = get_violations(stats, candidate)
+
+                # Scoring:
+                # Easter violation is worst
+                score = 0
+                if any(is_easter_week(m) for m in candidate):
+                    score += 100
+                # Lecture weeks < 13 is very bad
+                if stats['lecture_weeks'] < 13:
+                    score += 50
+                # Buffer violations
+                if stats['w_before'] < 7:
+                    score += (7 - stats['w_before'])
+                if stats['w_after'] < 7:
+                    score += (7 - stats['w_after'])
+
+                # Prefer smaller shifts if score is equal
+                # Shift back for P1: s
+                # Shift forward for P3: p3_opt != p3_mon
+                shift_size = (p1_mon - p1_opt[0]).days // 7 + (p3_opt - p3_mon).days // 7
+
+                if score < best_score:
+                    best_score = score
+                    best_p_mons = candidate
+                elif score == best_score:
+                    # Tie-break: prefer smaller shift
+                    if shift_size < ( (p1_mon - best_p_mons[0]).days // 7 + (best_p_mons[-1] - p3_mon).days // 7 ):
+                        best_p_mons = candidate
+
+        p_mons_best = best_p_mons
         plans = []
         stats_std = calculate_stats(p_mons_std, is_ws)
-        v_std = get_violations(stats_std)
+        v_std = get_violations(stats_std, p_mons_std)
 
         stats_best = calculate_stats(p_mons_best, is_ws)
-        v_best = get_violations(stats_best)
+        v_best = get_violations(stats_best, p_mons_best)
 
         if not v_best:
             plans.append(("Vorschlag", p_mons_best))
@@ -327,7 +347,7 @@ def main():
 
         for plan_name, current_plan_mons in plans:
             stats = calculate_stats(current_plan_mons, is_ws)
-            v = get_violations(stats)
+            v = get_violations(stats, current_plan_mons)
 
             if len(plans) > 1:
                 output_md += f"### Plan: {plan_name}\n\n"
