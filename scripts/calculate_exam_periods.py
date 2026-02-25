@@ -10,6 +10,7 @@ import sys
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
 
 # URL configuration
 VORLESUNGSZEITEN_URL = "https://www.th-koeln.de/studium/vorlesungszeiten_357.php"
@@ -359,6 +360,35 @@ def generate_pdf(all_semester_results):
             c.drawCentredString(x_pos + cell_width/2, y_pos - 15, f"W{i+1}")
             c.drawCentredString(x_pos + cell_width/2, y_pos + cell_height + 5, mon.strftime("%d.%m."))
 
+        # Stats and Table
+        stats = data['stats']
+        c.setFont("Helvetica", 10)
+        y_pos -= 60
+        c.drawString(50, y_pos, f"Anzahl Vorlesungswochen: {stats['lecture_weeks']}")
+        c.drawString(50, y_pos - 15, f"Vorlesungswochen vor HIP: {stats['w_before']}")
+        c.drawString(50, y_pos - 30, f"Vorlesungswochen nach HIP: {stats['w_after']}")
+
+        y_pos -= 60
+        table_data = [["P-Woche", "Zeitraum", "Feiertage", "Anmerkungen"]]
+        for r in data['rows']:
+            period = f"{r['start_wd']} {r['start_date'].strftime('%d.%m.%Y')} - {r['end_wd']} {r['end_date'].strftime('%d.%m.%Y')}"
+            table_data.append([str(r['num']), period, r['holidays'], r['notes']])
+
+        t = Table(table_data, colWidths=[60, 220, 150, 300])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ]))
+        w_t, h_t = t.wrapOn(c, width, height)
+        t.drawOn(c, 50, y_pos - h_t)
+
         c.showPage()
     c.save()
 
@@ -432,6 +462,28 @@ def main():
         stats_best = calculate_stats(p_mons_best, is_ws, l_start, l_end)
         v_best = get_violations(stats_best, p_mons_best, is_ws)
 
+        detailed_rows = []
+        WDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+        for i, mon in enumerate(p_mons_best):
+            days, hols = get_exam_days(mon, nh)
+            is_karneval = any((get_weiberfastnacht(d.year) - timedelta(days=get_weiberfastnacht(d.year).weekday())) == (d - timedelta(days=d.weekday())) for d in days)
+            hol_str = ", ".join([f"{h[0].strftime('%d.%m.')} ({h[1]})" for h in hols])
+            notes = []
+            if is_karneval: notes.append("Karnevalswoche")
+            if i == (num_start - 1) and stats_best['w_before'] < 7: notes.append(f"Warnung: Puffer vor HIP nur {stats_best['w_before']} Wochen")
+            if i == len(p_mons_best) - 1 and stats_best['w_after'] < 7: notes.append(f"Warnung: Puffer nach HIP nur {stats_best['w_after']} Wochen")
+
+            s_wd, e_wd = WDAYS[min(days).weekday()], WDAYS[max(days).weekday()]
+            detailed_rows.append({
+                'num': i+1,
+                'start_wd': s_wd,
+                'start_date': min(days),
+                'end_wd': e_wd,
+                'end_date': max(days),
+                'holidays': hol_str,
+                'notes': "; ".join(notes)
+            })
+
         all_semester_results[sem] = {
             'p_list': p_mons_best,
             'l_start': l_start,
@@ -439,7 +491,8 @@ def main():
             'hip_start': hip_start,
             'nh': nh,
             'stats': stats_best,
-            'violations': v_best
+            'violations': v_best,
+            'rows': detailed_rows
         }
 
         # MD output
@@ -454,23 +507,13 @@ def main():
         output_md += f"Vorlesungswochen nach HIP: {stats_best['w_after']}\n\n"
         output_md += "| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |\n| --- | --- | --- | --- |\n"
 
-        WDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-        for i, mon in enumerate(p_mons_best):
-            days, hols = get_exam_days(mon, nh)
-            is_karneval = any((get_weiberfastnacht(d.year) - timedelta(days=get_weiberfastnacht(d.year).weekday())) == (d - timedelta(days=d.weekday())) for d in days)
-            hol_str = ", ".join([f"{h[0].strftime('%d.%m.')} ({h[1]})" for h in hols])
-            notes = []
-            if is_karneval: notes.append("Karnevalswoche")
-            if i == (num_start - 1) and stats_best['w_before'] < 7: notes.append(f"Warnung: Puffer vor HIP nur {stats_best['w_before']} Wochen")
-            if i == len(p_mons_best) - 1 and stats_best['w_after'] < 7: notes.append(f"Warnung: Puffer nach HIP nur {stats_best['w_after']} Wochen")
-
-            s_wd, e_wd = WDAYS[min(days).weekday()], WDAYS[max(days).weekday()]
-            output_md += f"| {i+1} | {s_wd} {min(days).strftime('%d.%m.%Y')} - {e_wd} {max(days).strftime('%d.%m.%Y')} | {hol_str} | {'; '.join(notes)} |\n"
+        for r in detailed_rows:
+            output_md += f"| {r['num']} | {r['start_wd']} {r['start_date'].strftime('%d.%m.%Y')} - {r['end_wd']} {r['end_date'].strftime('%d.%m.%Y')} | {r['holidays']} | {r['notes']} |\n"
 
             event = ICalEvent()
-            event.add('summary', f"Prüfungswoche {i+1} {sem}")
-            event.add('dtstart', min(days))
-            event.add('dtend', max(days) + timedelta(days=1))
+            event.add('summary', f"Prüfungswoche {r['num']} {sem}")
+            event.add('dtstart', r['start_date'])
+            event.add('dtend', r['end_date'] + timedelta(days=1))
             cal.add_component(event)
         output_md += "\n"
 
