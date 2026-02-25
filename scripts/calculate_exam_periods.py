@@ -97,6 +97,38 @@ def get_exam_days(monday, nh):
     actual_exam_days.sort()
     return actual_exam_days, found_holidays
 
+def find_best_hip(l_start, l_end, is_winter, num_exams):
+    best_hip = None
+    best_score = 9999
+
+    # We try different buffers between the first exam block and the HIP week.
+    # buffer is the number of lecture weeks.
+    for buffer in range(6, 11):
+        hip_mon_cand = l_start + timedelta(weeks=num_exams + buffer)
+
+        # Estimate w_after including holidays for winter
+        p_stop_approx = l_end - timedelta(days=l_end.weekday())
+        w_after_cand = ((p_stop_approx - hip_mon_cand).days // 7) - 1
+        if is_winter:
+            w_after_cand -= get_ws_holiday_weeks(hip_mon_cand + timedelta(days=7), p_stop_approx - timedelta(days=7))
+
+        w_before_cand = buffer
+        # Technically holidays could be in w_before, but rare for Oct-Dec
+        if is_winter:
+            w_before_cand -= get_ws_holiday_weeks(l_start + timedelta(weeks=num_exams), hip_mon_cand - timedelta(days=7))
+
+        score = 0
+        # Heavily penalize any deviation from exactly 7 lecture weeks
+        if w_before_cand != 7: score += abs(7 - w_before_cand) * 100
+        if w_after_cand != 7: score += abs(7 - w_after_cand) * 100
+        score += abs(w_before_cand - w_after_cand)
+
+        if score < best_score:
+            best_score = score
+            best_hip = hip_mon_cand
+
+    return best_hip
+
 def scrape_data():
     # Scrape lecture times
     resp = requests.get(VORLESUNGSZEITEN_URL, timeout=30)
@@ -133,23 +165,27 @@ def scrape_data():
     soup = BeautifulSoup(resp.text, 'html.parser')
 
     hip_periods = {}
+    # Add hardcoded fallback for known fixed semester if not on website
+    hip_periods["Wintersemester 2025/26"] = (date(2025, 11, 17), date(2025, 11, 21))
+
     # Find all text and look for semester patterns
     page_text = soup.get_text(separator='\n')
     for line in page_text.split('\n'):
-        if ':' in line and 'semester' in line.lower():
-            match = re.search(r'(Wintersemester \d{4}/\d{2}|Sommersemester \d{4}):\s*([\d\.\s–-]+)', line)
+        if 'semester' in line.lower():
+            match = re.search(r'(Wintersemester \d{4}/\d{2}|Sommersemester \d{4}):?\s*([\d\.\s–-]|bis)+', line)
             if match:
                 sem = match.group(1).strip()
-                dates = match.group(2).strip()
+                dates = match.group(0).split(sem)[-1].strip(': ')
 
                 # Find year in dates
                 year_match = re.search(r'\d{4}', dates)
                 year = int(year_match.group()) if year_match else None
 
-                parts = re.split(r'[–-]', dates)
+                # Handle various separators
+                parts = re.split(r'[–-]|bis', dates)
                 if len(parts) >= 2:
-                    end = parse_date(parts[1], default_year=year)
-                    start = parse_date(parts[0], default_year=end.year if end else year)
+                    end = parse_date(parts[1].strip(), default_year=year)
+                    start = parse_date(parts[0].strip(), default_year=end.year if end else year)
 
                     if start and end:
                         hip_periods[sem] = (start, end)
@@ -162,9 +198,7 @@ def sem_key(sem_name):
     is_winter = 'Winter' in sem_name
     return (year, is_winter)
 
-PROPOSAL_BOUNDARY = (2028, False) # Sommersemester 2028
-
-def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
+def extrapolate_periods(lecture_periods, hip_periods, proposal_boundary, num_years=4):
     # Ensure all semesters in lecture_periods have HIP periods
     for sem_name in lecture_periods:
         if sem_name not in hip_periods:
@@ -172,27 +206,12 @@ def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
             is_winter = 'Winter' in sem_name
             num_exams = 2 if is_winter else 1
 
-            # For fixed semesters, use a default heuristic (e.g. 9th week of lecture)
-            # but don't optimize it.
-            if sem_key(sem_name) < PROPOSAL_BOUNDARY:
-                hip_mon = l_start + timedelta(weeks=8)
+            # For semesters before boundary, follow the "exactly 7 weeks" rule (week 9 for SS, 10 for WS)
+            if sem_key(sem_name) <= proposal_boundary:
+                hip_mon = l_start + timedelta(weeks=num_exams + 7)
             else:
                 # Optimize for proposals
-                def get_hip_candidate(exam_start_offset, lecture_buffer):
-                    p1_mon = l_start + timedelta(weeks=exam_start_offset)
-                    hip_mon = p1_mon + timedelta(weeks=num_exams + lecture_buffer)
-                    return hip_mon, p1_mon
-
-                hip_mon, p1_mon = get_hip_candidate(0, 9)
-                w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
-                if w_after < 7:
-                    hip_mon, p1_mon = get_hip_candidate(0, 7)
-                    w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
-                    if w_after < 7:
-                        hip_mon, p1_mon = get_hip_candidate(-1, 9)
-                        w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
-                        if w_after < 7:
-                            hip_mon, p1_mon = get_hip_candidate(-1, 7)
+                hip_mon = find_best_hip(l_start, l_end, is_winter, num_exams)
 
             hip_periods[sem_name] = (hip_mon, hip_mon + timedelta(days=4))
 
@@ -237,24 +256,10 @@ def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
             l_start, l_end = lecture_periods[sem_name]
             num_exams = 2 if curr_winter else 1
 
-            if sem_key(sem_name) < PROPOSAL_BOUNDARY:
-                hip_mon = l_start + timedelta(weeks=8)
+            if sem_key(sem_name) <= proposal_boundary:
+                hip_mon = l_start + timedelta(weeks=num_exams + 7)
             else:
-                def get_hip_candidate(exam_start_offset, lecture_buffer):
-                    p1_mon = l_start + timedelta(weeks=exam_start_offset)
-                    hip_mon = p1_mon + timedelta(weeks=num_exams + lecture_buffer)
-                    return hip_mon, p1_mon
-
-                hip_mon, p1_mon = get_hip_candidate(0, 9)
-                w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
-                if w_after < 7:
-                    hip_mon, p1_mon = get_hip_candidate(0, 7)
-                    w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
-                    if w_after < 7:
-                        hip_mon, p1_mon = get_hip_candidate(-1, 9)
-                        w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
-                        if w_after < 7:
-                            hip_mon, p1_mon = get_hip_candidate(-1, 7)
+                hip_mon = find_best_hip(l_start, l_end, curr_winter, num_exams)
 
             hip_periods[sem_name] = (hip_mon, hip_mon + timedelta(days=4))
 
@@ -293,23 +298,29 @@ def get_violations(stats, p_list, is_winter):
     if any(is_easter_week(m) for m in p_list): v.append("Prüfung in Osterwoche")
     return v
 
-def generate_pdf(all_semester_results):
+def generate_pdf(all_semester_results, proposal_boundary):
     os.makedirs('files', exist_ok=True)
     c = canvas.Canvas("files/exam_periods.pdf", pagesize=landscape(A4))
     width, height = landscape(A4)
 
     for sem_name, data in all_semester_results.items():
         title = f"Semesterplan: {sem_name}"
-        if sem_key(sem_name) >= PROPOSAL_BOUNDARY:
+        if sem_key(sem_name) > proposal_boundary:
             title += " (VORSCHLAG)"
 
         c.setFont("Helvetica-Bold", 16)
         c.drawString(50, height - 50, title)
 
+        # Lecture period
+        l_start = data['l_start']
+        l_end = data['l_end']
+        c.setFont("Helvetica", 12)
+        c.drawString(50, height - 70, f"Vorlesungszeit: {l_start.strftime('%d.%m.%Y')} - {l_end.strftime('%d.%m.%Y')}")
+
         # Legend
         c.setFont("Helvetica", 10)
         leg_x = 50
-        leg_y = height - 80
+        leg_y = height - 95
 
         colors_map = {
             "Prüfung": colors.orange,
@@ -414,7 +425,14 @@ def main():
         print(f"Error scraping data: {e}")
         sys.exit(1)
 
-    extrapolate_periods(lecture_periods, hip_periods, num_years=4)
+    # Determine boundary from what was ACTUALLY scraped
+    if hip_periods:
+        last_scraped_sem = max(hip_periods.keys(), key=sem_key)
+        proposal_boundary = sem_key(last_scraped_sem)
+    else:
+        proposal_boundary = (0, False)
+
+    extrapolate_periods(lecture_periods, hip_periods, proposal_boundary, num_years=4)
     available_sems = sorted(lecture_periods.keys(), key=sem_key)
 
     output_md = "# Vorschlag Prüfungszeiträume Informatik\n\n"
@@ -454,9 +472,9 @@ def main():
                 score = 0
                 if any(is_easter_week(m) for m in candidate): score += 1000
                 if stats['lecture_weeks'] < 13: score += 500
-                if stats['w_before'] < 7: score += (7 - stats['w_before']) * 10
-                if stats['w_after'] < 7: score += (7 - stats['w_after']) * 10
-                if stats['w_before'] >= 9: score -= 5
+                # Strictly prefer exactly 7 weeks buffer
+                if stats['w_before'] != 7: score += abs(7 - stats['w_before']) * 50
+                if stats['w_after'] != 7: score += abs(7 - stats['w_after']) * 50
 
                 # Gap check: First block must end no more than 1 week before lecture start
                 if p1_opt[-1] < p1_mon - timedelta(weeks=1):
@@ -486,7 +504,7 @@ def main():
             # Identify HIP week (it's the second to last in the list of exam weeks)
             if i == len(p_mons_best) - 2:
                 hip_note = "HIP-Woche"
-                if sem_key(sem) >= PROPOSAL_BOUNDARY:
+                if sem_key(sem) > proposal_boundary:
                     hip_note += " (VORSCHLAG)"
                 notes.append(hip_note)
 
@@ -516,10 +534,11 @@ def main():
         }
 
         sem_title = sem
-        if sem_key(sem) >= PROPOSAL_BOUNDARY:
+        if sem_key(sem) > proposal_boundary:
             sem_title += " (VORSCHLAG)"
 
         output_md += f"## {sem_title}\n\n"
+        output_md += f"Vorlesungszeit: {l_start.strftime('%d.%m.%Y')} - {l_end.strftime('%d.%m.%Y')}\n\n"
         if v_best:
             output_md += "**VERLETZTE BEDINGUNGEN:**\n"
             for vi in v_best: output_md += f"- {vi}\n"
@@ -541,7 +560,7 @@ def main():
 
     with open('files/exam_periods.md', 'w', encoding='utf-8') as f: f.write(output_md)
     with open('files/exam_periods.ics', 'wb') as f: f.write(cal.to_ical())
-    generate_pdf(all_semester_results)
+    generate_pdf(all_semester_results, proposal_boundary)
     print("Files generated: files/exam_periods.md, files/exam_periods.ics, files/exam_periods.pdf")
 
 if __name__ == "__main__":
