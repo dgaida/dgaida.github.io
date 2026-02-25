@@ -120,10 +120,13 @@ def test_extrapolate_periods():
     lp = {"Sommersemester 2024": (date(2024, 3, 18), date(2024, 7, 12))}
     hp = {"Sommersemester 2024": (date(2024, 5, 13), date(2024, 5, 17))}
 
-    extrapolate_periods(lp, hp, num_years=1)
+    extrapolate_periods(lp, hp, num_years=5)
 
     # Should have added WS 2024/25, SS 2025, etc.
     assert "Wintersemester 2024/25" in lp
     assert "Wintersemester 2024/25" in hp
     assert "Sommersemester 2025" in lp
     assert "Sommersemester 2025" in hp
+    # Check boundary
+    assert "Sommersemester 2028" in hp
+    assert "Wintersemester 2028/29" in hp
