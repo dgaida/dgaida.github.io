@@ -14,7 +14,8 @@ from calculate_exam_periods import (
     get_working_days_in_week,
     is_easter_week,
     get_ws_holiday_weeks,
-    get_exam_days
+    get_exam_days,
+    extrapolate_periods
 )
 
 def test_parse_date():
@@ -114,3 +115,15 @@ def test_scrape_data(mock_get):
     assert lp["Sommersemester 2024"] == (date(2024, 3, 18), date(2024, 7, 12))
     assert "Sommersemester 2024" in hp
     assert hp["Sommersemester 2024"] == (date(2024, 5, 13), date(2024, 5, 17))
+
+def test_extrapolate_periods():
+    lp = {"Sommersemester 2024": (date(2024, 3, 18), date(2024, 7, 12))}
+    hp = {"Sommersemester 2024": (date(2024, 5, 13), date(2024, 5, 17))}
+
+    extrapolate_periods(lp, hp, num_years=1)
+
+    # Should have added WS 2024/25, SS 2025, etc.
+    assert "Wintersemester 2024/25" in lp
+    assert "Wintersemester 2024/25" in hp
+    assert "Sommersemester 2025" in lp
+    assert "Sommersemester 2025" in hp

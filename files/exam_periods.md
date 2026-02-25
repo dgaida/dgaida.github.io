@@ -1,5 +1,33 @@
 # Vorschlag Prüfungszeiträume Informatik
 
+## Wintersemester 2025/26
+
+**VERLETZTE BEDINGUNGEN:**
+- Wochen nach HIP < 7 (6)
+
+Anzahl Vorlesungswochen: 15
+Vorlesungswochen vor HIP: 9
+Vorlesungswochen nach HIP: 6
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Mo 22.09.2025 - Fr 26.09.2025 |  |  |
+| 2 | Fr 26.09.2025 - Do 02.10.2025 | 03.10. (Tag der Deutschen Einheit) |  |
+| 3 | Mo 08.12.2025 - Fr 12.12.2025 |  |  |
+| 4 | Mo 09.02.2026 - Fr 13.02.2026 |  | Karnevalswoche; Warnung: Puffer nach HIP nur 6 Wochen |
+
+## Sommersemester 2026
+
+Anzahl Vorlesungswochen: 16
+Vorlesungswochen vor HIP: 7
+Vorlesungswochen nach HIP: 9
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Mo 23.03.2026 - Fr 27.03.2026 |  |  |
+| 2 | Mo 18.05.2026 - Fr 22.05.2026 |  |  |
+| 3 | Mo 27.07.2026 - Fr 31.07.2026 |  |  |
+
 ## Wintersemester 2026/27
 
 Anzahl Vorlesungswochen: 16
@@ -15,33 +43,13 @@ Vorlesungswochen nach HIP: 9
 
 ## Sommersemester 2027
 
-### Plan: Standard
-
-**VERLETZTE BEDINGUNGEN:**
-- Wochen vor HIP < 7 (4)
-
-Anzahl Vorlesungswochen: 13
-Vorlesungswochen vor HIP: 4
+Anzahl Vorlesungswochen: 16
+Vorlesungswochen vor HIP: 7
 Vorlesungswochen nach HIP: 9
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
-| 1 | Mo 05.04.2027 - Fr 09.04.2027 |  | Warnung: Puffer vor HIP nur 4 Wochen |
-| 2 | Mo 10.05.2027 - Fr 14.05.2027 |  |  |
-| 3 | Mo 19.07.2027 - Fr 23.07.2027 |  |  |
-
-### Plan: Optimierungsversuch
-
-**VERLETZTE BEDINGUNGEN:**
-- Wochen vor HIP < 7 (6)
-
-Anzahl Vorlesungswochen: 15
-Vorlesungswochen vor HIP: 6
-Vorlesungswochen nach HIP: 9
-
-| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
-| --- | --- | --- | --- |
-| 1 | Fr 19.03.2027 - Do 25.03.2027 | 26.03. (Karfreitag) | Warnung: Puffer vor HIP nur 6 Wochen |
+| 1 | Mo 15.03.2027 - Fr 19.03.2027 |  |  |
 | 2 | Mo 10.05.2027 - Fr 14.05.2027 |  |  |
 | 3 | Mo 19.07.2027 - Fr 23.07.2027 |  |  |
 
@@ -57,3 +65,99 @@ Vorlesungswochen nach HIP: 9
 | 2 | Mo 27.09.2027 - Fr 01.10.2027 |  |  |
 | 3 | Mo 22.11.2027 - Fr 26.11.2027 |  |  |
 | 4 | Mo 07.02.2028 - Fr 11.02.2028 |  |  |
+
+## Sommersemester 2028
+
+Anzahl Vorlesungswochen: 16
+Vorlesungswochen vor HIP: 9
+Vorlesungswochen nach HIP: 7
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Mo 20.03.2028 - Fr 24.03.2028 |  |  |
+| 2 | Mo 29.05.2028 - Fr 02.06.2028 |  |  |
+| 3 | Mo 24.07.2028 - Fr 28.07.2028 |  |  |
+
+## Wintersemester 2028/29
+
+**VERLETZTE BEDINGUNGEN:**
+- Wochen nach HIP < 7 (6)
+
+Anzahl Vorlesungswochen: 15
+Vorlesungswochen vor HIP: 9
+Vorlesungswochen nach HIP: 6
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Mo 25.09.2028 - Fr 29.09.2028 |  |  |
+| 2 | Fr 29.09.2028 - Fr 06.10.2028 | 03.10. (Tag der Deutschen Einheit) |  |
+| 3 | Mo 11.12.2028 - Fr 15.12.2028 |  |  |
+| 4 | Fr 09.02.2029 - Fr 16.02.2029 | 12.02. (Rosenmontag) | Karnevalswoche; Warnung: Puffer nach HIP nur 6 Wochen |
+
+## Sommersemester 2029
+
+Anzahl Vorlesungswochen: 16
+Vorlesungswochen vor HIP: 9
+Vorlesungswochen nach HIP: 7
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Mo 12.03.2029 - Fr 16.03.2029 |  |  |
+| 2 | Fr 18.05.2029 - Fr 25.05.2029 | 21.05. (Pfingstmontag) |  |
+| 3 | Mo 16.07.2029 - Fr 20.07.2029 |  |  |
+
+## Wintersemester 2029/30
+
+**VERLETZTE BEDINGUNGEN:**
+- Wochen nach HIP < 7 (6)
+
+Anzahl Vorlesungswochen: 15
+Vorlesungswochen vor HIP: 9
+Vorlesungswochen nach HIP: 6
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Mo 24.09.2029 - Fr 28.09.2029 |  |  |
+| 2 | Fr 28.09.2029 - Fr 05.10.2029 | 03.10. (Tag der Deutschen Einheit) |  |
+| 3 | Mo 10.12.2029 - Fr 14.12.2029 |  |  |
+| 4 | Mo 11.02.2030 - Fr 15.02.2030 |  | Warnung: Puffer nach HIP nur 6 Wochen |
+
+## Sommersemester 2030
+
+Anzahl Vorlesungswochen: 16
+Vorlesungswochen vor HIP: 9
+Vorlesungswochen nach HIP: 7
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Fr 01.03.2030 - Fr 08.03.2030 | 04.03. (Rosenmontag) | Karnevalswoche |
+| 2 | Mo 13.05.2030 - Fr 17.05.2030 |  |  |
+| 3 | Mo 08.07.2030 - Fr 12.07.2030 |  |  |
+
+## Wintersemester 2030/31
+
+**VERLETZTE BEDINGUNGEN:**
+- Wochen nach HIP < 7 (6)
+
+Anzahl Vorlesungswochen: 15
+Vorlesungswochen vor HIP: 9
+Vorlesungswochen nach HIP: 6
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Mo 23.09.2030 - Fr 27.09.2030 |  |  |
+| 2 | Fr 27.09.2030 - Fr 04.10.2030 | 03.10. (Tag der Deutschen Einheit) |  |
+| 3 | Mo 09.12.2030 - Fr 13.12.2030 |  |  |
+| 4 | Mo 10.02.2031 - Fr 14.02.2031 |  | Warnung: Puffer nach HIP nur 6 Wochen |
+
+## Sommersemester 2031
+
+Anzahl Vorlesungswochen: 17
+Vorlesungswochen vor HIP: 9
+Vorlesungswochen nach HIP: 8
+
+| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
+| --- | --- | --- | --- |
+| 1 | Mo 03.03.2031 - Fr 07.03.2031 |  |  |
+| 2 | Mo 12.05.2031 - Fr 16.05.2031 |  |  |
+| 3 | Mo 14.07.2031 - Fr 18.07.2031 |  |  |
