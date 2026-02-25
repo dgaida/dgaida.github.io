@@ -162,7 +162,8 @@ def test_exam_week_structure_and_buffers():
         date(2024, 5, 13), # P2 (HIP)
         date(2024, 7, 8)   # P3
     ]
-    stats_ss = calculate_stats(p_list_ss, False, l_start_ss, l_end_ss)
+    nh_ss = get_nrw_holidays(l_start_ss.year)
+    stats_ss = calculate_stats(p_list_ss, False, l_start_ss, l_end_ss, nh_ss)
     assert stats_ss['w_before'] == 7
     assert stats_ss['w_after'] == 7
     assert len(p_list_ss) == 3
@@ -178,7 +179,8 @@ def test_exam_week_structure_and_buffers():
         date(2025, 2, 3)   # P3 - 7 weeks after PW 3 (including 2 weeks Christmas break)
     ]
     # Check Christmas weeks: 23.12-27.12, 30.12-03.01
-    stats_ws = calculate_stats(p_list_ws, True, l_start_ws, l_end_ws)
+    nh_ws = get_nrw_holidays(l_start_ws.year)
+    stats_ws = calculate_stats(p_list_ws, True, l_start_ws, l_end_ws, nh_ws)
     assert stats_ws['w_before'] == 7
     assert stats_ws['w_after'] == 7 # PW3 (Nov 25) to PW4 (Feb 3) is 10 weeks. 10 - 1 (PW3 itself) - 2 (holidays) = 7
     assert len(p_list_ws) == 4
@@ -189,7 +191,8 @@ def test_min_lecture_weeks():
     l_start = date(2024, 3, 18)
     l_end = date(2024, 6, 14) # Very short semester
     p_list = [date(2024, 3, 18), date(2024, 4, 29), date(2024, 6, 10)]
-    stats = calculate_stats(p_list, False, l_start, l_end)
+    nh = get_nrw_holidays(l_start.year)
+    stats = calculate_stats(p_list, False, l_start, l_end, nh)
     violations = get_violations(stats, p_list, False)
     assert any("Vorlesungswochen < 13" in v for v in violations)
 
@@ -211,3 +214,36 @@ def test_holiday_shift_freitag_vorher():
     days, _ = get_exam_days(monday, nh)
     assert date(2024, 5, 17) in days # Previous Friday
     assert date(2024, 5, 20) not in days
+
+def test_ws2829_logic():
+    from calculate_exam_periods import calculate_stats, get_exam_days
+    l_start = date(2028, 9, 25)
+    l_end = date(2029, 2, 9)
+    nh = get_nrw_holidays(2028)
+
+    # WS 28/29 typical Mondays
+    p_list = [
+        date(2028, 9, 25), # P1a
+        date(2028, 10, 2), # P1b
+        date(2028, 11, 27),# P2 (HIP)
+        date(2029, 2, 5)   # P3
+    ]
+
+    # Check shift/overlap logic for P1a/P1b
+    # We process in reverse to simulate what main/calculate_stats does
+    used_days = set()
+    days1b, _ = get_exam_days(p_list[1], nh, used_days)
+    used_days.update(days1b)
+    # Oct 3rd 2028 is Tuesday. P1b should take Fr 29.09.2028.
+    assert date(2028, 9, 29) in days1b
+
+    days1a, _ = get_exam_days(p_list[0], nh, used_days)
+    # P1a should see Fr 29.09 is taken, so it takes Fr 22.09.
+    assert date(2028, 9, 22) in days1a
+    assert date(2028, 9, 29) not in days1a
+
+    # Check stats
+    stats = calculate_stats(p_list, True, l_start, l_end, nh)
+    assert stats['lecture_weeks'] == 14
+    assert stats['w_before'] == 7
+    assert stats['w_after'] == 7

@@ -33,6 +33,8 @@ Die Prüfungszeiträume werden pro Semester nach folgendem Schema festgelegt:
 
 ### Feiertags- und Sonderregeln
 - **"Freitag-vorher"-Regel**: Fällt ein gesetzlicher Feiertag (NRW) in die reguläre Prüfungswoche (Mo-Fr), wird der Prüfungszeitraum um die entsprechende Anzahl Tage auf den/die Freitag(e) der Vorwoche vorgezogen, um volle 5 Prüfungstage zu gewährleisten.
+  - *Abhängigkeit*: Sollte durch das Vorziehen ein Konflikt mit der vorangegangenen Prüfungswoche entstehen (Überlappung), wird auch die vorangegangene Woche entsprechend auf den/die Freitag(e) ihrer Vorwoche vorgezogen.
+- **Zählung der Vorlesungswochen**: Eine Woche gilt nur dann als volle Vorlesungswoche, wenn sie keinen Prüfungstag enthält. Beginnt eine Prüfung beispielsweise an einem Freitag einer regulären Vorlesungswoche, wird diese Woche in der Statistik nicht mehr als Vorlesungswoche gezählt.
 - **Oster-Regel**: In der Woche des Ostermontags finden keine Prüfungen statt. Der Zeitraum wird um eine Woche nach hinten verschoben, sofern die Bedingung von mindestens 13 Vorlesungswochen weiterhin erfüllt bleibt.
 - **Weihnachts-/Neujahrspause (nur WS)**: Wochen, in denen der 24.-26.12. oder der 01.01. auf einen Arbeitstag (Mo-Fr) fallen, werden nicht als Vorlesungswochen gezählt.
 - **Karneval**: Die Karnevalswoche (Woche mit Weiberfastnacht) wird im Plan explizit markiert. Rosenmontag wird als Feiertag (Köln-spezifisch) berücksichtigt.
