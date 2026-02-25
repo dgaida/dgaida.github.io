@@ -198,9 +198,7 @@ def sem_key(sem_name):
     is_winter = 'Winter' in sem_name
     return (year, is_winter)
 
-PROPOSAL_BOUNDARY = (2028, False) # Sommersemester 2028
-
-def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
+def extrapolate_periods(lecture_periods, hip_periods, proposal_boundary, num_years=4):
     # Ensure all semesters in lecture_periods have HIP periods
     for sem_name in lecture_periods:
         if sem_name not in hip_periods:
@@ -208,8 +206,8 @@ def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
             is_winter = 'Winter' in sem_name
             num_exams = 2 if is_winter else 1
 
-            # For fixed semesters, follow the "exactly 7 weeks" rule (week 9 for SS, 10 for WS)
-            if sem_key(sem_name) < PROPOSAL_BOUNDARY:
+            # For semesters before boundary, follow the "exactly 7 weeks" rule (week 9 for SS, 10 for WS)
+            if sem_key(sem_name) <= proposal_boundary:
                 hip_mon = l_start + timedelta(weeks=num_exams + 7)
             else:
                 # Optimize for proposals
@@ -258,7 +256,7 @@ def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
             l_start, l_end = lecture_periods[sem_name]
             num_exams = 2 if curr_winter else 1
 
-            if sem_key(sem_name) < PROPOSAL_BOUNDARY:
+            if sem_key(sem_name) <= proposal_boundary:
                 hip_mon = l_start + timedelta(weeks=num_exams + 7)
             else:
                 hip_mon = find_best_hip(l_start, l_end, curr_winter, num_exams)
@@ -300,14 +298,14 @@ def get_violations(stats, p_list, is_winter):
     if any(is_easter_week(m) for m in p_list): v.append("Prüfung in Osterwoche")
     return v
 
-def generate_pdf(all_semester_results):
+def generate_pdf(all_semester_results, proposal_boundary):
     os.makedirs('files', exist_ok=True)
     c = canvas.Canvas("files/exam_periods.pdf", pagesize=landscape(A4))
     width, height = landscape(A4)
 
     for sem_name, data in all_semester_results.items():
         title = f"Semesterplan: {sem_name}"
-        if sem_key(sem_name) >= PROPOSAL_BOUNDARY:
+        if sem_key(sem_name) > proposal_boundary:
             title += " (VORSCHLAG)"
 
         c.setFont("Helvetica-Bold", 16)
@@ -427,7 +425,14 @@ def main():
         print(f"Error scraping data: {e}")
         sys.exit(1)
 
-    extrapolate_periods(lecture_periods, hip_periods, num_years=4)
+    # Determine boundary from what was ACTUALLY scraped
+    if hip_periods:
+        last_scraped_sem = max(hip_periods.keys(), key=sem_key)
+        proposal_boundary = sem_key(last_scraped_sem)
+    else:
+        proposal_boundary = (0, False)
+
+    extrapolate_periods(lecture_periods, hip_periods, proposal_boundary, num_years=4)
     available_sems = sorted(lecture_periods.keys(), key=sem_key)
 
     output_md = "# Vorschlag Prüfungszeiträume Informatik\n\n"
@@ -499,7 +504,7 @@ def main():
             # Identify HIP week (it's the second to last in the list of exam weeks)
             if i == len(p_mons_best) - 2:
                 hip_note = "HIP-Woche"
-                if sem_key(sem) >= PROPOSAL_BOUNDARY:
+                if sem_key(sem) > proposal_boundary:
                     hip_note += " (VORSCHLAG)"
                 notes.append(hip_note)
 
@@ -529,7 +534,7 @@ def main():
         }
 
         sem_title = sem
-        if sem_key(sem) >= PROPOSAL_BOUNDARY:
+        if sem_key(sem) > proposal_boundary:
             sem_title += " (VORSCHLAG)"
 
         output_md += f"## {sem_title}\n\n"
@@ -555,7 +560,7 @@ def main():
 
     with open('files/exam_periods.md', 'w', encoding='utf-8') as f: f.write(output_md)
     with open('files/exam_periods.ics', 'wb') as f: f.write(cal.to_ical())
-    generate_pdf(all_semester_results)
+    generate_pdf(all_semester_results, proposal_boundary)
     print("Files generated: files/exam_periods.md, files/exam_periods.ics, files/exam_periods.pdf")
 
 if __name__ == "__main__":
