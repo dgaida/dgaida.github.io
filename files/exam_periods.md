@@ -36,9 +36,9 @@ Vorlesungswochen nach HIP: 9
 
 Vorlesungszeit: 28.09.2026 - 12.02.2027
 
-Anzahl Vorlesungswochen: 16
+Anzahl Vorlesungswochen: 15
 Vorlesungswochen vor HIP: 7
-Vorlesungswochen nach HIP: 9
+Vorlesungswochen nach HIP: 8
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
@@ -103,7 +103,7 @@ Vorlesungswochen nach HIP: 7
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
-| 1 | Mo 25.09.2028 - Fr 29.09.2028 |  |  |
+| 1 | Fr 22.09.2028 - Do 28.09.2028 |  |  |
 | 2 | Fr 29.09.2028 - Fr 06.10.2028 | 03.10. (Tag der Deutschen Einheit) |  |
 | 3 | Mo 27.11.2028 - Fr 01.12.2028 |  | HIP-Woche (VORSCHLAG) |
 | 4 | Mo 05.02.2029 - Fr 09.02.2029 |  | Karnevalswoche |
@@ -118,7 +118,7 @@ Vorlesungswochen nach HIP: 7
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
-| 1 | Fr 23.03.2029 - Do 29.03.2029 | 30.03. (Karfreitag) |  |
+| 1 | Mo 19.03.2029 - Fr 23.03.2029 |  |  |
 | 2 | Fr 18.05.2029 - Fr 25.05.2029 | 21.05. (Pfingstmontag) | HIP-Woche (VORSCHLAG) |
 | 3 | Mo 16.07.2029 - Fr 20.07.2029 |  |  |
 
@@ -132,7 +132,7 @@ Vorlesungswochen nach HIP: 7
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
-| 1 | Mo 24.09.2029 - Fr 28.09.2029 |  |  |
+| 1 | Fr 21.09.2029 - Do 27.09.2029 |  |  |
 | 2 | Fr 28.09.2029 - Fr 05.10.2029 | 03.10. (Tag der Deutschen Einheit) |  |
 | 3 | Mo 26.11.2029 - Fr 30.11.2029 |  | HIP-Woche (VORSCHLAG) |
 | 4 | Mo 04.02.2030 - Fr 08.02.2030 |  |  |
@@ -161,7 +161,7 @@ Vorlesungswochen nach HIP: 7
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
-| 1 | Mo 23.09.2030 - Fr 27.09.2030 |  |  |
+| 1 | Fr 20.09.2030 - Do 26.09.2030 |  |  |
 | 2 | Fr 27.09.2030 - Fr 04.10.2030 | 03.10. (Tag der Deutschen Einheit) |  |
 | 3 | Mo 25.11.2030 - Fr 29.11.2030 |  | HIP-Woche (VORSCHLAG) |
 | 4 | Mo 03.02.2031 - Fr 07.02.2031 |  |  |
@@ -170,12 +170,12 @@ Vorlesungswochen nach HIP: 7
 
 Vorlesungszeit: 17.03.2031 - 18.07.2031
 
-Anzahl Vorlesungswochen: 15
+Anzahl Vorlesungswochen: 14
 Vorlesungswochen vor HIP: 7
-Vorlesungswochen nach HIP: 8
+Vorlesungswochen nach HIP: 7
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
 | 1 | Mo 17.03.2031 - Fr 21.03.2031 |  |  |
-| 2 | Mo 12.05.2031 - Fr 16.05.2031 |  | HIP-Woche (VORSCHLAG) |
+| 2 | Fr 16.05.2031 - Fr 23.05.2031 | 22.05. (Christi Himmelfahrt) | HIP-Woche (VORSCHLAG) |
 | 3 | Mo 14.07.2031 - Fr 18.07.2031 |  |  |

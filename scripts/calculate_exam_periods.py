@@ -69,59 +69,61 @@ def get_ws_holiday_weeks(p1_mon, p3_mon):
         current += timedelta(days=7)
     return holiday_weeks
 
-def get_exam_days(monday, nh):
+def get_exam_days(monday, nh, used_days=None):
+    if used_days is None:
+        used_days = set()
     target_days = get_working_days_in_week(monday)
-    holiday_count = 0
     actual_exam_days = []
     found_holidays = []
 
     for d in target_days:
         if d in nh:
-            holiday_count += 1
             found_holidays.append((d, nh[d]))
+        elif d in used_days:
+            pass # Day already taken by another week
         else:
             actual_exam_days.append(d)
 
-    # Add days from previous week if holidays found
-    if holiday_count > 0:
-        # Start from previous Friday
-        current = monday - timedelta(days=3) # Friday
-        while holiday_count > 0:
-            if current.weekday() < 5 and current not in nh:
-                actual_exam_days.append(current)
-                holiday_count -= 1
-            elif current in nh:
-                found_holidays.append((current, nh[current]))
+    # Add days from previous week if holidays or overlaps found
+    needed = 5 - len(actual_exam_days)
+    if needed > 0:
+        # Search backwards starting from the day before Monday
+        current = monday - timedelta(days=1)
+        while needed > 0:
+            if current.weekday() < 5:
+                if current in nh:
+                    found_holidays.append((current, nh[current]))
+                elif current in used_days:
+                    pass
+                else:
+                    actual_exam_days.append(current)
+                    needed -= 1
             current -= timedelta(days=1)
 
     actual_exam_days.sort()
     return actual_exam_days, found_holidays
 
-def find_best_hip(l_start, l_end, is_winter, num_exams):
+def find_best_hip(l_start, l_end, is_winter, num_exams, nh):
     best_hip = None
     best_score = 9999
 
+    p1_mon = l_start - timedelta(days=l_start.weekday())
+    p3_mon = l_end - timedelta(days=l_end.weekday())
+
     # We try different buffers between the first exam block and the HIP week.
-    # buffer is the number of lecture weeks.
     for buffer in range(6, 11):
         hip_mon_cand = l_start + timedelta(weeks=num_exams + buffer)
 
-        # Estimate w_after including holidays for winter
-        p_stop_approx = l_end - timedelta(days=l_end.weekday())
-        w_after_cand = ((p_stop_approx - hip_mon_cand).days // 7) - 1
-        if is_winter:
-            w_after_cand -= get_ws_holiday_weeks(hip_mon_cand + timedelta(days=7), p_stop_approx - timedelta(days=7))
+        p1_opt = [p1_mon + timedelta(weeks=i) for i in range(num_exams)]
+        candidate = p1_opt + [hip_mon_cand, p3_mon]
 
-        w_before_cand = buffer
-        # Technically holidays could be in w_before, but rare for Oct-Dec
-        if is_winter:
-            w_before_cand -= get_ws_holiday_weeks(l_start + timedelta(weeks=num_exams), hip_mon_cand - timedelta(days=7))
+        stats = calculate_stats(candidate, is_winter, l_start, l_end, nh)
 
         score = 0
         # Heavily penalize any deviation from exactly 7 lecture weeks
-        if w_before_cand != 7: score += abs(7 - w_before_cand) * 100
-        if w_after_cand != 7: score += abs(7 - w_after_cand) * 100
-        score += abs(w_before_cand - w_after_cand)
+        if stats['w_before'] != 7: score += abs(7 - stats['w_before']) * 100
+        if stats['w_after'] != 7: score += abs(7 - stats['w_after']) * 100
+        score += abs(stats['w_before'] - stats['w_after'])
 
         if score < best_score:
             best_score = score
@@ -205,13 +207,14 @@ def extrapolate_periods(lecture_periods, hip_periods, proposal_boundary, num_yea
             l_start, l_end = lecture_periods[sem_name]
             is_winter = 'Winter' in sem_name
             num_exams = 2 if is_winter else 1
+            nh = get_nrw_holidays(l_start.year)
 
             # For semesters before boundary, follow the "exactly 7 weeks" rule (week 9 for SS, 10 for WS)
             if sem_key(sem_name) <= proposal_boundary:
                 hip_mon = l_start + timedelta(weeks=num_exams + 7)
             else:
                 # Optimize for proposals
-                hip_mon = find_best_hip(l_start, l_end, is_winter, num_exams)
+                hip_mon = find_best_hip(l_start, l_end, is_winter, num_exams, nh)
 
             hip_periods[sem_name] = (hip_mon, hip_mon + timedelta(days=4))
 
@@ -255,39 +258,79 @@ def extrapolate_periods(lecture_periods, hip_periods, proposal_boundary, num_yea
         if sem_name not in hip_periods:
             l_start, l_end = lecture_periods[sem_name]
             num_exams = 2 if curr_winter else 1
+            nh = get_nrw_holidays(l_start.year)
 
             if sem_key(sem_name) <= proposal_boundary:
                 hip_mon = l_start + timedelta(weeks=num_exams + 7)
             else:
-                hip_mon = find_best_hip(l_start, l_end, curr_winter, num_exams)
+                hip_mon = find_best_hip(l_start, l_end, curr_winter, num_exams, nh)
 
             hip_periods[sem_name] = (hip_mon, hip_mon + timedelta(days=4))
 
-def calculate_stats(p_list, is_winter, l_start, l_end):
-    p_start = p_list[0]
-    p_hip = p_list[-2]
-    p_p1_end = p_list[1] if is_winter else p_list[0]
-    p_stop = p_list[-1]
+def calculate_stats(p_list, is_winter, l_start, l_end, nh):
+    # Determine all actual exam days for this candidate
+    # Process in reverse order to correctly account for shifts/overlaps
+    p_days_map = {}
+    used_days = set()
+    for mon in reversed(p_list):
+        days, _ = get_exam_days(mon, nh, used_days)
+        p_days_map[mon] = days
+        used_days.update(days)
+    all_exam_days = used_days
 
-    total_w = ((p_stop - p_start).days // 7) + 1
-    exam_w = len(p_list)
-    h_w = get_ws_holiday_weeks(p_start, p_stop) if is_winter else 0
-    lecture_w = total_w - exam_w - h_w
+    def is_full_lecture_week(monday):
+        week_days = [monday + timedelta(days=i) for i in range(5)]
+        # No exam days in the week
+        if any(d in all_exam_days for d in week_days): return False
+        # Not a holiday week (Christmas/New Year)
+        is_christmas = any(d.month == 12 and d.day in [24, 25, 26] for d in week_days)
+        is_new_year = any(d.month == 1 and d.day == 1 for d in week_days)
+        if is_christmas or is_new_year: return False
+        # Overlaps with lecture period
+        if not any(l_start <= d <= l_end for d in week_days): return False
+        return True
+
+    # Total lecture weeks in semester
+    lecture_w = 0
+    curr = l_start - timedelta(days=l_start.weekday())
+    while curr <= l_end:
+        if is_full_lecture_week(curr):
+            lecture_w += 1
+        curr += timedelta(days=7)
 
     # Buffers
-    w_before = ((p_hip - p_p1_end).days // 7) - 1
-    if is_winter:
-        w_before -= get_ws_holiday_weeks(p_p1_end + timedelta(days=7), p_hip - timedelta(days=7))
+    # P1 (end) and P2 (HIP)
+    p1_end_mon = p_list[1] if is_winter else p_list[0]
+    p1_max_day = max(p_days_map[p1_end_mon])
+    p2_mon = p_list[-2] # HIP
+    p2_min_day = min(p_days_map[p2_mon])
 
-    w_after = ((p_stop - p_hip).days // 7) - 1
-    if is_winter:
-        w_after -= get_ws_holiday_weeks(p_hip + timedelta(days=7), p_stop - timedelta(days=7))
+    w_before = 0
+    curr = p1_max_day + timedelta(days=1)
+    if curr.weekday() != 0:
+        curr += timedelta(days=(7-curr.weekday()))
+    while curr < (p2_min_day - timedelta(days=p2_min_day.weekday())):
+        if is_full_lecture_week(curr):
+            w_before += 1
+        curr += timedelta(days=7)
+
+    # P2 (HIP) and P3
+    p3_mon = p_list[-1]
+    p3_min_day = min(p_days_map[p3_mon])
+
+    w_after = 0
+    curr = p2_min_day + timedelta(days=1)
+    if curr.weekday() != 0:
+        curr += timedelta(days=(7-curr.weekday()))
+    while curr < (p3_min_day - timedelta(days=p3_min_day.weekday())):
+        if is_full_lecture_week(curr):
+            w_after += 1
+        curr += timedelta(days=7)
 
     return {
         'lecture_weeks': lecture_w,
         'w_before': w_before,
-        'w_after': w_after,
-        'total_weeks': total_w
+        'w_after': w_after
     }
 
 def get_violations(stats, p_list, is_winter):
@@ -342,9 +385,10 @@ def generate_pdf(all_semester_results, proposal_boundary):
         l_end = data['l_end']
         hip_start = data['hip_start']
         nh = data['nh']
+        all_exam_days = data['all_exam_days']
 
         # Calculate start of visual period
-        v_start = min(l_start, p_list[0])
+        v_start = min(l_start, min(all_exam_days))
         v_start = v_start - timedelta(days=v_start.weekday())
         v_end = max(l_end, p_list[-1])
         v_end = v_end + timedelta(days=(6 - v_end.weekday()))
@@ -360,7 +404,7 @@ def generate_pdf(all_semester_results, proposal_boundary):
 
             # Determine color
             week_days = [mon + timedelta(days=d) for d in range(5)]
-            is_exam = mon in p_list
+            is_exam = any(d in all_exam_days for d in week_days)
             is_hip = (mon <= hip_start <= mon + timedelta(days=6))
 
             main_color = colors.red # Default lecture
@@ -466,7 +510,7 @@ def main():
         for p1_opt in p1_options:
             for p3_opt in p3_options:
                 candidate = p1_opt + [p2_mon, p3_opt]
-                stats = calculate_stats(candidate, is_ws, l_start, l_end)
+                stats = calculate_stats(candidate, is_ws, l_start, l_end, nh)
                 violations = get_violations(stats, candidate, is_ws)
 
                 score = 0
@@ -489,13 +533,22 @@ def main():
                         best_p_mons = candidate
 
         p_mons_best = best_p_mons
-        stats_best = calculate_stats(p_mons_best, is_ws, l_start, l_end)
+        stats_best = calculate_stats(p_mons_best, is_ws, l_start, l_end, nh)
         v_best = get_violations(stats_best, p_mons_best, is_ws)
 
         detailed_rows = []
         WDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+
+        # Final day calculation (must be in reverse to handle overlaps correctly)
+        best_days_map = {}
+        used_days = set()
+        for mon in reversed(p_mons_best):
+            days, hols = get_exam_days(mon, nh, used_days)
+            best_days_map[mon] = (days, hols)
+            used_days.update(days)
+
         for i, mon in enumerate(p_mons_best):
-            days, hols = get_exam_days(mon, nh)
+            days, hols = best_days_map[mon]
             is_karneval = any((get_weiberfastnacht(d.year) - timedelta(days=get_weiberfastnacht(d.year).weekday())) == (d - timedelta(days=d.weekday())) for d in days)
             hol_str = ", ".join([f"{h[0].strftime('%d.%m.')} ({h[1]})" for h in hols])
             notes = []
@@ -530,7 +583,8 @@ def main():
             'nh': nh,
             'stats': stats_best,
             'violations': v_best,
-            'rows': detailed_rows
+            'rows': detailed_rows,
+            'all_exam_days': used_days
         }
 
         sem_title = sem
