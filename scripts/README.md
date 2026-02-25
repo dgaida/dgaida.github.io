@@ -27,6 +27,10 @@ Die Prüfungszeiträume werden pro Semester nach folgendem Schema festgelegt:
 2. **Buffer vor HIP**: Zwischen den ersten Prüfungswochen (P1/P1b) und der HIP-Woche (P2) müssen genau **7 reine Vorlesungswochen** liegen.
 3. **Buffer nach HIP**: Zwischen der HIP-Woche (P2) und der letzten Prüfungswoche (P3) müssen genau **7 reine Vorlesungswochen** liegen.
 
+### Vorschlag vs. Fix
+- **Fixe Termine**: Termine, die offiziell auf der TH-Webseite für die Interdisziplinäre Projektwoche (HIP) angekündigt sind, werden prioritär übernommen, auch wenn sie die Buffer-Regeln verletzen.
+- **Vorschläge**: Für alle weiteren Semester (ab Sommersemester 2028) berechnet das Skript optimale Zeiträume, die strikt die 7-Wochen-Regel anstreben und Feiertage sowie Semesterferien berücksichtigen.
+
 ### Feiertags- und Sonderregeln
 - **"Freitag-vorher"-Regel**: Fällt ein gesetzlicher Feiertag (NRW) in die reguläre Prüfungswoche (Mo-Fr), wird der Prüfungszeitraum um die entsprechende Anzahl Tage auf den/die Freitag(e) der Vorwoche vorgezogen, um volle 5 Prüfungstage zu gewährleisten.
 - **Oster-Regel**: In der Woche des Ostermontags finden keine Prüfungen statt. Der Zeitraum wird um eine Woche nach hinten verschoben, sofern die Bedingung von mindestens 13 Vorlesungswochen weiterhin erfüllt bleibt.

@@ -5,15 +5,15 @@
 Vorlesungszeit: 22.09.2025 - 06.02.2026
 
 Anzahl Vorlesungswochen: 15
-Vorlesungswochen vor HIP: 8
-Vorlesungswochen nach HIP: 7
+Vorlesungswochen vor HIP: 7
+Vorlesungswochen nach HIP: 8
 
 | Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |
 | --- | --- | --- | --- |
-| 1 | Mo 22.09.2025 - Fr 26.09.2025 |  |  |
-| 2 | Fr 26.09.2025 - Do 02.10.2025 | 03.10. (Tag der Deutschen Einheit) |  |
-| 3 | Mo 01.12.2025 - Fr 05.12.2025 |  | HIP-Woche |
-| 4 | Mo 09.02.2026 - Fr 13.02.2026 |  | Karnevalswoche |
+| 1 | Mo 15.09.2025 - Fr 19.09.2025 |  |  |
+| 2 | Mo 22.09.2025 - Fr 26.09.2025 |  |  |
+| 3 | Mo 17.11.2025 - Fr 21.11.2025 |  | HIP-Woche |
+| 4 | Mo 02.02.2026 - Fr 06.02.2026 |  |  |
 
 ## Sommersemester 2026
 

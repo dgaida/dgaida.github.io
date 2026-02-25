@@ -118,8 +118,9 @@ def find_best_hip(l_start, l_end, is_winter, num_exams):
             w_before_cand -= get_ws_holiday_weeks(l_start + timedelta(weeks=num_exams), hip_mon_cand - timedelta(days=7))
 
         score = 0
-        if w_before_cand < 7: score += (7 - w_before_cand) * 100
-        if w_after_cand < 7: score += (7 - w_after_cand) * 100
+        # Heavily penalize any deviation from exactly 7 lecture weeks
+        if w_before_cand != 7: score += abs(7 - w_before_cand) * 100
+        if w_after_cand != 7: score += abs(7 - w_after_cand) * 100
         score += abs(w_before_cand - w_after_cand)
 
         if score < best_score:
@@ -164,23 +165,27 @@ def scrape_data():
     soup = BeautifulSoup(resp.text, 'html.parser')
 
     hip_periods = {}
+    # Add hardcoded fallback for known fixed semester if not on website
+    hip_periods["Wintersemester 2025/26"] = (date(2025, 11, 17), date(2025, 11, 21))
+
     # Find all text and look for semester patterns
     page_text = soup.get_text(separator='\n')
     for line in page_text.split('\n'):
-        if ':' in line and 'semester' in line.lower():
-            match = re.search(r'(Wintersemester \d{4}/\d{2}|Sommersemester \d{4}):\s*([\d\.\s–-]+)', line)
+        if 'semester' in line.lower():
+            match = re.search(r'(Wintersemester \d{4}/\d{2}|Sommersemester \d{4}):?\s*([\d\.\s–-]|bis)+', line)
             if match:
                 sem = match.group(1).strip()
-                dates = match.group(2).strip()
+                dates = match.group(0).split(sem)[-1].strip(': ')
 
                 # Find year in dates
                 year_match = re.search(r'\d{4}', dates)
                 year = int(year_match.group()) if year_match else None
 
-                parts = re.split(r'[–-]', dates)
+                # Handle various separators
+                parts = re.split(r'[–-]|bis', dates)
                 if len(parts) >= 2:
-                    end = parse_date(parts[1], default_year=year)
-                    start = parse_date(parts[0], default_year=end.year if end else year)
+                    end = parse_date(parts[1].strip(), default_year=year)
+                    start = parse_date(parts[0].strip(), default_year=end.year if end else year)
 
                     if start and end:
                         hip_periods[sem] = (start, end)
@@ -203,10 +208,9 @@ def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
             is_winter = 'Winter' in sem_name
             num_exams = 2 if is_winter else 1
 
-            # For fixed semesters, use a default heuristic (e.g. 9th week of lecture)
-            # but don't optimize it.
+            # For fixed semesters, follow the "exactly 7 weeks" rule (week 9 for SS, 10 for WS)
             if sem_key(sem_name) < PROPOSAL_BOUNDARY:
-                hip_mon = l_start + timedelta(weeks=num_exams + 8)
+                hip_mon = l_start + timedelta(weeks=num_exams + 7)
             else:
                 # Optimize for proposals
                 hip_mon = find_best_hip(l_start, l_end, is_winter, num_exams)
@@ -255,7 +259,7 @@ def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
             num_exams = 2 if curr_winter else 1
 
             if sem_key(sem_name) < PROPOSAL_BOUNDARY:
-                hip_mon = l_start + timedelta(weeks=num_exams + 8)
+                hip_mon = l_start + timedelta(weeks=num_exams + 7)
             else:
                 hip_mon = find_best_hip(l_start, l_end, curr_winter, num_exams)
 
@@ -463,8 +467,9 @@ def main():
                 score = 0
                 if any(is_easter_week(m) for m in candidate): score += 1000
                 if stats['lecture_weeks'] < 13: score += 500
-                if stats['w_before'] < 7: score += (7 - stats['w_before']) * 10
-                if stats['w_after'] < 7: score += (7 - stats['w_after']) * 10
+                # Strictly prefer exactly 7 weeks buffer
+                if stats['w_before'] != 7: score += abs(7 - stats['w_before']) * 50
+                if stats['w_after'] != 7: score += abs(7 - stats['w_after']) * 50
 
                 # Gap check: First block must end no more than 1 week before lecture start
                 if p1_opt[-1] < p1_mon - timedelta(weeks=1):
