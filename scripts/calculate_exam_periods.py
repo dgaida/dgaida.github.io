@@ -458,6 +458,10 @@ def main():
                 if stats['w_after'] < 7: score += (7 - stats['w_after']) * 10
                 if stats['w_before'] >= 9: score -= 5
 
+                # Gap check: First block must end no more than 1 week before lecture start
+                if p1_opt[-1] < p1_mon - timedelta(weeks=1):
+                    score += 1000
+
                 shift_size = abs((p1_mon - p1_opt[0]).days // 7) + abs((p3_opt - p3_mon).days // 7)
                 if score < best_score:
                     best_score = score
