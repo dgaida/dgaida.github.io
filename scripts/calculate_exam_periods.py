@@ -1,12 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 import holidays
 from dateutil import easter
 from icalendar import Calendar, Event as ICalEvent
 import os
 import sys
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib import colors
 
 # URL configuration
 VORLESUNGSZEITEN_URL = "https://www.th-koeln.de/studium/vorlesungszeiten_357.php"
@@ -151,6 +154,214 @@ def scrape_data():
 
     return lecture_periods, hip_periods
 
+def extrapolate_periods(lecture_periods, hip_periods, num_years=4):
+    # Ensure all semesters in lecture_periods have HIP periods
+    for sem_name in lecture_periods:
+        if sem_name not in hip_periods:
+            l_start, l_end = lecture_periods[sem_name]
+            is_winter = 'Winter' in sem_name
+            num_exams = 2 if is_winter else 1
+
+            def get_hip_candidate(exam_start_offset, lecture_buffer):
+                p1_mon = l_start + timedelta(weeks=exam_start_offset)
+                hip_mon = p1_mon + timedelta(weeks=num_exams + lecture_buffer)
+                return hip_mon, p1_mon
+
+            hip_mon, p1_mon = get_hip_candidate(0, 9)
+            w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
+            if w_after < 7:
+                hip_mon, p1_mon = get_hip_candidate(0, 7)
+                w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
+                if w_after < 7:
+                    hip_mon, p1_mon = get_hip_candidate(-1, 9)
+                    w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
+                    if w_after < 7:
+                        hip_mon, p1_mon = get_hip_candidate(-1, 7)
+            hip_periods[sem_name] = (hip_mon, hip_mon + timedelta(days=4))
+
+    all_sems = sorted(lecture_periods.keys(), key=lambda x: (int(re.search(r'\d{4}', x).group()), 'Winter' in x))
+    if not all_sems:
+        last_year = datetime.now().year
+        is_winter = False
+    else:
+        last_sem = all_sems[-1]
+        last_year = int(re.search(r'\d{4}', last_sem).group())
+        is_winter = 'Winter' in last_sem
+
+    target_year = datetime.now().year + num_years
+    curr_year = last_year
+    curr_winter = is_winter
+
+    while curr_year <= target_year:
+        if curr_winter:
+            curr_year += 1
+            sem_name = f"Sommersemester {curr_year}"
+            curr_winter = False
+        else:
+            sem_name = f"Wintersemester {curr_year}/{str(curr_year+1)[2:]}"
+            curr_winter = True
+
+        if sem_name not in lecture_periods:
+            if not curr_winter: # SS
+                # SS starts Monday of CW 12
+                start = date(curr_year, 3, 10)
+                while start.isocalendar()[1] < 12 or start.weekday() != 0:
+                    start += timedelta(days=1)
+                end = start + timedelta(weeks=17, days=4)
+                lecture_periods[sem_name] = (start, end)
+            else: # WS
+                # WS starts Monday of CW 39
+                start = date(curr_year, 9, 20)
+                while start.isocalendar()[1] < 39 or start.weekday() != 0:
+                    start += timedelta(days=1)
+                end = start + timedelta(weeks=19, days=4)
+                lecture_periods[sem_name] = (start, end)
+
+        if sem_name not in hip_periods:
+            l_start, l_end = lecture_periods[sem_name]
+            # HIP logic: target 9 weeks lecture buffer if possible, or 7
+            # WS has 2 exam weeks, SS has 1.
+            num_exams = 2 if curr_winter else 1
+
+            def get_hip_candidate(exam_start_offset, lecture_buffer):
+                p1_mon = l_start + timedelta(weeks=exam_start_offset)
+                hip_mon = p1_mon + timedelta(weeks=num_exams + lecture_buffer)
+                return hip_mon, p1_mon
+
+            # Try 9 weeks lecture buffer, starting exams at l_start
+            hip_mon, p1_mon = get_hip_candidate(0, 9)
+            w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
+
+            if w_after < 7:
+                # Try 7 weeks lecture buffer
+                hip_mon, p1_mon = get_hip_candidate(0, 7)
+                w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
+
+                if w_after < 7:
+                    # Still < 7? Shift everything forward
+                    hip_mon, p1_mon = get_hip_candidate(-1, 9)
+                    w_after = (l_end - (hip_mon + timedelta(days=7))).days // 7
+                    if w_after < 7:
+                        hip_mon, p1_mon = get_hip_candidate(-1, 7)
+
+            hip_periods[sem_name] = (hip_mon, hip_mon + timedelta(days=4))
+
+def calculate_stats(p_list, is_winter, l_start, l_end):
+    p_start = p_list[0]
+    p_hip = p_list[-2]
+    p_p1_end = p_list[1] if is_winter else p_list[0]
+    p_stop = p_list[-1]
+
+    total_w = ((p_stop - p_start).days // 7) + 1
+    exam_w = len(p_list)
+    h_w = get_ws_holiday_weeks(p_start, p_stop) if is_winter else 0
+    lecture_w = total_w - exam_w - h_w
+
+    # Buffers
+    w_before = ((p_hip - p_p1_end).days // 7) - 1
+    if is_winter:
+        w_before -= get_ws_holiday_weeks(p_p1_end + timedelta(days=7), p_hip - timedelta(days=7))
+
+    w_after = ((p_stop - p_hip).days // 7) - 1
+    if is_winter:
+        w_after -= get_ws_holiday_weeks(p_hip + timedelta(days=7), p_stop - timedelta(days=7))
+
+    return {
+        'lecture_weeks': lecture_w,
+        'w_before': w_before,
+        'w_after': w_after,
+        'total_weeks': total_w
+    }
+
+def get_violations(stats, p_list, is_winter):
+    v = []
+    if stats['lecture_weeks'] < 13: v.append(f"Vorlesungswochen < 13 ({stats['lecture_weeks']})")
+    if stats['w_before'] < 7: v.append(f"Wochen vor HIP < 7 ({stats['w_before']})")
+    if stats['w_after'] < 7: v.append(f"Wochen nach HIP < 7 ({stats['w_after']})")
+    if any(is_easter_week(m) for m in p_list): v.append("Prüfung in Osterwoche")
+    return v
+
+def generate_pdf(all_semester_results):
+    os.makedirs('files', exist_ok=True)
+    c = canvas.Canvas("files/exam_periods.pdf", pagesize=landscape(A4))
+    width, height = landscape(A4)
+
+    for sem_name, data in all_semester_results.items():
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(50, height - 50, f"Semesterplan: {sem_name}")
+
+        # Legend
+        c.setFont("Helvetica", 10)
+        leg_x = 50
+        leg_y = height - 80
+
+        colors_map = {
+            "Prüfung": colors.orange,
+            "Vorlesung": colors.red,
+            "HIP-Woche": colors.yellow,
+            "Feiertag": colors.green
+        }
+
+        for label, color in colors_map.items():
+            c.setFillColor(color)
+            c.rect(leg_x, leg_y, 15, 10, fill=1)
+            c.setFillColor(colors.black)
+            c.drawString(leg_x + 20, leg_y + 2, label)
+            leg_x += 100
+
+        # Table
+        p_list = data['p_list']
+        l_start = data['l_start']
+        l_end = data['l_end']
+        hip_start = data['hip_start']
+        nh = data['nh']
+
+        # Calculate start of visual period
+        v_start = min(l_start, p_list[0])
+        v_start = v_start - timedelta(days=v_start.weekday())
+        v_end = max(l_end, p_list[-1])
+        v_end = v_end + timedelta(days=(6 - v_end.weekday()))
+
+        num_weeks = (v_end - v_start).days // 7 + 1
+        cell_width = (width - 100) / num_weeks
+        cell_height = 40
+        y_pos = height - 150
+
+        for i in range(num_weeks):
+            mon = v_start + timedelta(weeks=i)
+            x_pos = 50 + i * cell_width
+
+            # Determine color
+            week_days = [mon + timedelta(days=d) for d in range(5)]
+            is_exam = mon in p_list
+            is_hip = (mon <= hip_start <= mon + timedelta(days=6))
+
+            main_color = colors.red # Default lecture
+            if is_exam: main_color = colors.orange
+            if is_hip: main_color = colors.yellow
+
+            # Draw main cell
+            c.setFillColor(main_color)
+            c.rect(x_pos, y_pos, cell_width, cell_height, fill=1)
+
+            # Draw holidays
+            hols_in_week = [d for d in week_days if d in nh]
+            for idx, hol in enumerate(hols_in_week):
+                # 1/5th width per holiday
+                c.setFillColor(colors.green)
+                c.rect(x_pos + (cell_width/5) * week_days.index(hol), y_pos, cell_width/5, cell_height, fill=1)
+
+            # Borders and labels
+            c.setStrokeColor(colors.black)
+            c.rect(x_pos, y_pos, cell_width, cell_height, fill=0)
+            c.setFillColor(colors.black)
+            c.setFont("Helvetica", 8)
+            c.drawCentredString(x_pos + cell_width/2, y_pos - 15, f"W{i+1}")
+            c.drawCentredString(x_pos + cell_width/2, y_pos + cell_height + 5, mon.strftime("%d.%m."))
+
+        c.showPage()
+    c.save()
+
 def main():
     try:
         lecture_periods, hip_periods = scrape_data()
@@ -158,251 +369,115 @@ def main():
         print(f"Error scraping data: {e}")
         sys.exit(1)
 
-    # Start from WS 2026/27
-    start_sem = "Wintersemester 2026/27"
+    extrapolate_periods(lecture_periods, hip_periods, num_years=4)
 
-    # End semester is the last one in HIP
-    available_sems = sorted(hip_periods.keys(), key=lambda x: (int(re.search(r'\d{4}', x).group()), 'Winter' in x))
-    if not available_sems:
-        print("No HIP semesters found.")
-        sys.exit(1)
+    # Start from current or specified
+    start_sem = "Wintersemester 2026/27" # Keep as per original or update to now?
+    # Actually, let's include all from now on.
 
-    last_sem = available_sems[-1]
+    available_sems = sorted(lecture_periods.keys(), key=lambda x: (int(re.search(r'\d{4}', x).group()), 'Winter' in x))
 
     output_md = "# Vorschlag Prüfungszeiträume Informatik\n\n"
     cal = Calendar()
     cal.add('prodid', '-//TH Köln Exam Periods//mxm.dk//')
     cal.add('version', '2.0')
 
-    nh = get_nrw_holidays(2026) # Will be updated in loop
+    all_semester_results = {}
 
-    current_year = 2026
-
-    target_sems = []
-    found_start = False
-    for sem in sorted(lecture_periods.keys(), key=lambda x: (int(re.search(r'\d{4}', x).group()), 'Winter' in x)):
-        if sem == start_sem:
-            found_start = True
-        if found_start:
-            target_sems.append(sem)
-        if sem == last_sem:
-            break
-
-    for sem in target_sems:
-        if sem not in lecture_periods or sem not in hip_periods:
-            continue
-
+    for sem in available_sems:
         is_ws = 'Winter' in sem
         l_start, l_end = lecture_periods[sem]
         hip_start, hip_end = hip_periods[sem]
 
         nh = get_nrw_holidays(l_start.year)
-
-        # Determine standard P periods
         p1_mon = l_start - timedelta(days=l_start.weekday())
         p2_mon = hip_start - timedelta(days=hip_start.weekday())
         p3_mon = l_end - timedelta(days=l_end.weekday())
 
-        def calculate_stats(p_list, is_winter):
-            p_start = p_list[0]
-            p_hip = p_list[-2]
-            p_p1_end = p_list[1] if is_winter else p_list[0]
-            p_stop = p_list[-1]
-
-            total_w = ((p_stop - p_start).days // 7) + 1
-            exam_w = len(p_list)
-            h_w = get_ws_holiday_weeks(p_start, p_stop) if is_winter else 0
-            lecture_w = total_w - exam_w - h_w
-
-            # Buffers
-            w_before = ((p_hip - p_p1_end).days // 7) - 1
-            if is_winter:
-                w_before -= get_ws_holiday_weeks(p_p1_end + timedelta(days=7), p_hip - timedelta(days=7))
-
-            w_after = ((p_stop - p_hip).days // 7) - 1
-            if is_winter:
-                w_after -= get_ws_holiday_weeks(p_hip + timedelta(days=7), p_stop - timedelta(days=7))
-
-            return {
-                'lecture_weeks': lecture_w,
-                'w_before': w_before,
-                'w_after': w_after,
-                'total_weeks': total_w
-            }
-
-        # Initial p_mons: WS has 2 start weeks
-        if is_ws:
-            p_mons_std = [p1_mon, p1_mon + timedelta(days=7), p2_mon, p3_mon]
-        else:
-            p_mons_std = [p1_mon, p2_mon, p3_mon]
-
-        def apply_easter_rule(p_list, is_winter):
-            for i in range(len(p_list)):
-                if is_easter_week(p_list[i]):
-                    temp = list(p_list)
-                    temp[i] += timedelta(days=7)
-                    if calculate_stats(temp, is_winter)['lecture_weeks'] >= 13:
-                        return temp
-            return p_list
-
-        p_mons_std = apply_easter_rule(p_mons_std, is_ws)
-
-        def get_violations(stats, p_list):
-            v = []
-            if stats['lecture_weeks'] < 13: v.append(f"Vorlesungswochen < 13 ({stats['lecture_weeks']})")
-            if stats['w_before'] < 7: v.append(f"Wochen vor HIP < 7 ({stats['w_before']})")
-            if stats['w_after'] < 7: v.append(f"Wochen nach HIP < 7 ({stats['w_after']})")
-            if any(is_easter_week(m) for m in p_list): v.append("Prüfung in Osterwoche")
-            return v
-
-        # Find best plan by exploring No-Gap options
         num_start = 2 if is_ws else 1
         p1_options = []
-        for s in range(num_start + 1): # 0, 1, (2 for WS)
-            opt = []
-            for i in range(num_start):
-                opt.append(p1_mon - timedelta(weeks=s) + timedelta(weeks=i))
+        for s in range(-2, 3): # Explore broader range
+            opt = [p1_mon + timedelta(weeks=s) + timedelta(weeks=i) for i in range(num_start)]
             p1_options.append(opt)
 
         p3_options = [p3_mon, p3_mon + timedelta(weeks=1)]
 
         best_p_mons = None
-        best_score = 999
+        best_score = 9999
 
         for p1_opt in p1_options:
             for p3_opt in p3_options:
                 candidate = p1_opt + [p2_mon, p3_opt]
-                stats = calculate_stats(candidate, is_ws)
-                violations = get_violations(stats, candidate)
+                stats = calculate_stats(candidate, is_ws, l_start, l_end)
+                violations = get_violations(stats, candidate, is_ws)
 
-                # Scoring:
-                # Easter violation is worst
                 score = 0
-                if any(is_easter_week(m) for m in candidate):
-                    score += 100
-                # Lecture weeks < 13 is very bad
-                if stats['lecture_weeks'] < 13:
-                    score += 50
-                # Buffer violations
-                if stats['w_before'] < 7:
-                    score += (7 - stats['w_before'])
-                if stats['w_after'] < 7:
-                    score += (7 - stats['w_after'])
+                if any(is_easter_week(m) for m in candidate): score += 1000
+                if stats['lecture_weeks'] < 13: score += 500
+                if stats['w_before'] < 7: score += (7 - stats['w_before']) * 10
+                if stats['w_after'] < 7: score += (7 - stats['w_after']) * 10
 
-                # Prefer smaller shifts if score is equal
-                # Shift back for P1: s
-                # Shift forward for P3: p3_opt != p3_mon
-                shift_size = (p1_mon - p1_opt[0]).days // 7 + (p3_opt - p3_mon).days // 7
+                # Favor 9 weeks before
+                if stats['w_before'] >= 9: score -= 5
 
+                shift_size = abs((p1_mon - p1_opt[0]).days // 7) + abs((p3_opt - p3_mon).days // 7)
                 if score < best_score:
                     best_score = score
                     best_p_mons = candidate
                 elif score == best_score:
-                    # Tie-break: prefer smaller shift
-                    if shift_size < ( (p1_mon - best_p_mons[0]).days // 7 + (best_p_mons[-1] - p3_mon).days // 7 ):
+                    if shift_size < abs((p1_mon - best_p_mons[0]).days // 7) + abs((best_p_mons[-1] - p3_mon).days // 7):
                         best_p_mons = candidate
 
         p_mons_best = best_p_mons
-        plans = []
-        stats_std = calculate_stats(p_mons_std, is_ws)
-        v_std = get_violations(stats_std, p_mons_std)
+        stats_best = calculate_stats(p_mons_best, is_ws, l_start, l_end)
+        v_best = get_violations(stats_best, p_mons_best, is_ws)
 
-        stats_best = calculate_stats(p_mons_best, is_ws)
-        v_best = get_violations(stats_best, p_mons_best)
+        all_semester_results[sem] = {
+            'p_list': p_mons_best,
+            'l_start': l_start,
+            'l_end': l_end,
+            'hip_start': hip_start,
+            'nh': nh,
+            'stats': stats_best,
+            'violations': v_best
+        }
 
-        if not v_best:
-            plans.append(("Vorschlag", p_mons_best))
-        else:
-            plans.append(("Standard", p_mons_std))
-            if p_mons_best != p_mons_std:
-                plans.append(("Optimierungsversuch", p_mons_best))
-
-        WDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-        def process_plan(p_list):
-            results = []
-            for i, mon in enumerate(p_list):
-                days, hols = get_exam_days(mon, nh)
-
-                # Check if any day in the exam period falls into a Karnevalswoche
-                # A week is a Karnevalswoche if it contains Weiberfastnacht
-                is_karneval = False
-                for d in days:
-                    wf = get_weiberfastnacht(d.year)
-                    wf_monday = wf - timedelta(days=wf.weekday())
-                    d_monday = d - timedelta(days=d.weekday())
-                    if wf_monday == d_monday:
-                        is_karneval = True
-                        break
-
-                results.append({
-                    'week_num': i+1,
-                    'start': min(days),
-                    'end': max(days),
-                    'holidays': hols,
-                    'is_karneval': is_karneval
-                })
-            return results
-
+        # MD output
         output_md += f"## {sem}\n\n"
-
-        for plan_name, current_plan_mons in plans:
-            stats = calculate_stats(current_plan_mons, is_ws)
-            v = get_violations(stats, current_plan_mons)
-
-            if len(plans) > 1:
-                output_md += f"### Plan: {plan_name}\n\n"
-
-            if v:
-                output_md += "**VERLETZTE BEDINGUNGEN:**\n"
-                for vi in v:
-                    output_md += f"- {vi}\n"
-                output_md += "\n"
-
-            res = process_plan(current_plan_mons)
-
-            output_md += f"Anzahl Vorlesungswochen: {stats['lecture_weeks']}\n"
-            output_md += f"Vorlesungswochen vor HIP: {stats['w_before']}\n"
-            output_md += f"Vorlesungswochen nach HIP: {stats['w_after']}\n\n"
-
-            output_md += "| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |\n"
-            output_md += "| --- | --- | --- | --- |\n"
-
-            for r in res:
-                hol_str = ", ".join([f"{h[0].strftime('%d.%m.')} ({h[1]})" for h in r['holidays']])
-                notes = []
-                if r['is_karneval']: notes.append("Karnevalswoche")
-
-                # Check buffer violations for this plan
-                if r['week_num'] == (2 if is_ws else 1) and stats['w_before'] < 7:
-                    notes.append(f"Warnung: Puffer vor HIP nur {stats['w_before']} Wochen")
-                if r['week_num'] == len(current_plan_mons) and stats['w_after'] < 7:
-                    notes.append(f"Warnung: Puffer nach HIP nur {stats['w_after']} Wochen")
-
-                note = "; ".join(notes)
-                s_wd = WDAYS[r['start'].weekday()]
-                e_wd = WDAYS[r['end'].weekday()]
-                output_md += f"| {r['week_num']} | {s_wd} {r['start'].strftime('%d.%m.%Y')} - {e_wd} {r['end'].strftime('%d.%m.%Y')} | {hol_str} | {note} |\n"
-
+        if v_best:
+            output_md += "**VERLETZTE BEDINGUNGEN:**\n"
+            for vi in v_best: output_md += f"- {vi}\n"
             output_md += "\n"
 
-            # Add to ICS (only standard if no warning, or both?)
-            # Usually we want the proposed one. If warning, maybe both with different summaries.
-            for r in res:
-                event = ICalEvent()
-                plan_suffix = f" ({plan_name})" if len(plans) > 1 else ""
-                event.add('summary', f"Prüfungswoche {r['week_num']} {sem}{plan_suffix}")
-                event.add('dtstart', r['start'])
-                event.add('dtend', r['end'] + timedelta(days=1))
-                cal.add_component(event)
+        output_md += f"Anzahl Vorlesungswochen: {stats_best['lecture_weeks']}\n"
+        output_md += f"Vorlesungswochen vor HIP: {stats_best['w_before']}\n"
+        output_md += f"Vorlesungswochen nach HIP: {stats_best['w_after']}\n\n"
+        output_md += "| Prüfungswoche | Zeitraum | Feiertage | Anmerkungen |\n| --- | --- | --- | --- |\n"
 
-    os.makedirs('files', exist_ok=True)
-    with open('files/exam_periods.md', 'w', encoding='utf-8') as f:
-        f.write(output_md)
+        WDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+        for i, mon in enumerate(p_mons_best):
+            days, hols = get_exam_days(mon, nh)
+            is_karneval = any((get_weiberfastnacht(d.year) - timedelta(days=get_weiberfastnacht(d.year).weekday())) == (d - timedelta(days=d.weekday())) for d in days)
+            hol_str = ", ".join([f"{h[0].strftime('%d.%m.')} ({h[1]})" for h in hols])
+            notes = []
+            if is_karneval: notes.append("Karnevalswoche")
+            if i == (num_start - 1) and stats_best['w_before'] < 7: notes.append(f"Warnung: Puffer vor HIP nur {stats_best['w_before']} Wochen")
+            if i == len(p_mons_best) - 1 and stats_best['w_after'] < 7: notes.append(f"Warnung: Puffer nach HIP nur {stats_best['w_after']} Wochen")
 
-    with open('files/exam_periods.ics', 'wb') as f:
-        f.write(cal.to_ical())
+            s_wd, e_wd = WDAYS[min(days).weekday()], WDAYS[max(days).weekday()]
+            output_md += f"| {i+1} | {s_wd} {min(days).strftime('%d.%m.%Y')} - {e_wd} {max(days).strftime('%d.%m.%Y')} | {hol_str} | {'; '.join(notes)} |\n"
 
-    print("Files generated: files/exam_periods.md, files/exam_periods.ics")
+            event = ICalEvent()
+            event.add('summary', f"Prüfungswoche {i+1} {sem}")
+            event.add('dtstart', min(days))
+            event.add('dtend', max(days) + timedelta(days=1))
+            cal.add_component(event)
+        output_md += "\n"
+
+    with open('files/exam_periods.md', 'w', encoding='utf-8') as f: f.write(output_md)
+    with open('files/exam_periods.ics', 'wb') as f: f.write(cal.to_ical())
+    generate_pdf(all_semester_results)
+    print("Files generated: files/exam_periods.md, files/exam_periods.ics, files/exam_periods.pdf")
 
 if __name__ == "__main__":
     main()
