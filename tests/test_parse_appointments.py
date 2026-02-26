@@ -1,3 +1,10 @@
+"""Unit tests for the appointment parsing script.
+
+This module contains tests for scraping PDF links from the TH Köln website,
+detecting strikethrough text in PDFs, and parsing campus appointments into
+iCalendar format.
+"""
+
 import sys
 import os
 import pytest
@@ -14,7 +21,8 @@ sys.modules['docling.document_converter'] = MagicMock()
 from parse_appointments import scrape_pdf_links, is_strikethrough
 
 @patch("parse_appointments.requests.get")
-def test_scrape_pdf_links(mock_get):
+def test_scrape_pdf_links(mock_get: MagicMock) -> None:
+    """Test scraping of PDF download links for campus and exam appointments."""
     mock_resp = MagicMock()
     mock_resp.text = """
     <div>
@@ -31,17 +39,13 @@ def test_scrape_pdf_links(mock_get):
     assert links['campus'] == "https://www.th-koeln.de/campus.pdf"
     assert links['pruefungszeiten'] == "https://www.th-koeln.de/pruefung.pdf"
 
-def test_is_strikethrough():
+def test_is_strikethrough() -> None:
+    """Test detection of strikethrough formatting in a PDF page for a given cell."""
     page = MagicMock()
     # Horizontal line in the middle
     page.lines = [{'top': 50, 'bottom': 50.5, 'x0': 10, 'x1': 90}]
 
-    # Cell bbox: x0, y0, x1, y1 (y0 is top, y1 is bottom in many PDF libs,
-    # but let's check parse_appointments code:
-    # x0, y0, x1, y1 = table_cell
-    # ly = line['top']
-    # if y0 + 3 < ly < y1 - 3:
-
+    # Cell bbox: x0, y0, x1, y1
     cell_bbox = (0, 40, 100, 60)
     assert is_strikethrough(page, cell_bbox) is True
 
@@ -52,7 +56,8 @@ def test_is_strikethrough():
 @patch("parse_appointments.requests.get")
 @patch("parse_appointments.DocumentConverter")
 @patch("builtins.open", new_callable=mock_open)
-def test_parse_campus_appointments(mock_file, mock_converter_class, mock_get):
+def test_parse_campus_appointments(mock_file: MagicMock, mock_converter_class: MagicMock, mock_get: MagicMock) -> None:
+    """Test parsing of campus appointments from a PDF into an iCalendar object."""
     from parse_appointments import parse_campus_appointments
     from icalendar import Calendar
 

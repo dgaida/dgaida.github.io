@@ -1,3 +1,10 @@
+"""Unit tests for the exam period calculation script.
+
+This module contains tests for the logic in `scripts/calculate_exam_periods.py`,
+verifying date parsing, holiday handling, and the scoring system for proposing
+exam weeks.
+"""
+
 import sys
 import os
 from datetime import date, datetime, timedelta
@@ -18,7 +25,8 @@ from calculate_exam_periods import (
     extrapolate_periods
 )
 
-def test_parse_date():
+def test_parse_date() -> None:
+    """Test the parsing of date strings in various formats."""
     assert parse_date("20.03.2024") == date(2024, 3, 20)
     assert parse_date("20.03.", default_year=2024) == date(2024, 3, 20)
     assert parse_date("20. 03. 2024") == date(2024, 3, 20)
@@ -26,7 +34,8 @@ def test_parse_date():
     assert parse_date("20.03. – 21.03.2024") == date(2024, 3, 21)
     assert parse_date("invalid") is None
 
-def test_get_nrw_holidays():
+def test_get_nrw_holidays() -> None:
+    """Test retrieval of public holidays in North Rhine-Westphalia (NRW)."""
     nh = get_nrw_holidays(2024)
     # Check some known holidays in NRW 2024
     assert date(2024, 1, 1) in nh # Neujahr
@@ -36,31 +45,36 @@ def test_get_nrw_holidays():
     assert date(2024, 2, 12) in nh
     assert nh[date(2024, 2, 12)] == "Rosenmontag"
 
-def test_get_weiberfastnacht():
+def test_get_weiberfastnacht() -> None:
+    """Test calculation of Weiberfastnacht for a given year."""
     # Weiberfastnacht 2024 was Feb 8
     assert get_weiberfastnacht(2024) == date(2024, 2, 8)
 
-def test_get_working_days_in_week():
+def test_get_working_days_in_week() -> None:
+    """Test identification of working days (Mon-Fri) for a given week."""
     monday = date(2024, 3, 18)
     working_days = get_working_days_in_week(monday)
     assert len(working_days) == 5
     assert working_days[0] == date(2024, 3, 18)
     assert working_days[4] == date(2024, 3, 22)
 
-def test_is_easter_week():
+def test_is_easter_week() -> None:
+    """Test detection of whether a week is Easter week."""
     # Easter Sunday 2024 was March 31. Easter Monday was April 1.
     # The week starting April 1 is the easter week.
     assert is_easter_week(date(2024, 4, 1)) is True
     assert is_easter_week(date(2024, 3, 25)) is False
 
-def test_get_ws_holiday_weeks():
+def test_get_ws_holiday_weeks() -> None:
+    """Test counting of holiday weeks during the winter semester break."""
     p1 = date(2024, 12, 16)
     p3 = date(2025, 1, 6)
     # Week of Dec 23-27 contains Christmas
     # Week of Dec 30-Jan 3 contains New Year
     assert get_ws_holiday_weeks(p1, p3) == 2
 
-def test_get_exam_days_no_holidays():
+def test_get_exam_days_no_holidays() -> None:
+    """Test exam day generation when no holidays are present."""
     nh = {}
     monday = date(2024, 3, 18)
     days, found_hols = get_exam_days(monday, nh)
@@ -69,7 +83,8 @@ def test_get_exam_days_no_holidays():
     assert days[4] == date(2024, 3, 22)
     assert len(found_hols) == 0
 
-def test_get_exam_days_with_holidays():
+def test_get_exam_days_with_holidays() -> None:
+    """Test exam day generation and Friday shift logic when holidays occur."""
     # May 1st 2024 was a Wednesday
     nh = {date(2024, 5, 1): "Tag der Arbeit"}
     monday = date(2024, 4, 29)
@@ -82,7 +97,8 @@ def test_get_exam_days_with_holidays():
     assert found_hols[0][0] == date(2024, 5, 1)
 
 @patch('calculate_exam_periods.requests.get')
-def test_scrape_data(mock_get):
+def test_scrape_data(mock_get: MagicMock) -> None:
+    """Test scraping of semester dates and HIP proposal dates from TH Köln website."""
     mock_resp_v = MagicMock()
     # The script expects semester and dates in separate rows
     mock_resp_v.text = """
@@ -116,7 +132,8 @@ def test_scrape_data(mock_get):
     assert "Sommersemester 2024" in hp
     assert hp["Sommersemester 2024"] == (date(2024, 5, 13), date(2024, 5, 17))
 
-def test_extrapolate_periods():
+def test_extrapolate_periods() -> None:
+    """Test extrapolation of semester dates into the future."""
     from calculate_exam_periods import sem_key
     lp = {"Sommersemester 2024": (date(2024, 3, 18), date(2024, 7, 12))}
     hp = {"Sommersemester 2024": (date(2024, 5, 13), date(2024, 5, 17))}
@@ -133,7 +150,8 @@ def test_extrapolate_periods():
     assert "Sommersemester 2028" in hp
     assert "Wintersemester 2028/29" in hp
 
-def test_dynamic_proposal_boundary():
+def test_dynamic_proposal_boundary() -> None:
+    """Test that exam periods beyond the scraped boundary are dynamically proposed."""
     from calculate_exam_periods import sem_key, extrapolate_periods
 
     lp = {
@@ -150,7 +168,8 @@ def test_dynamic_proposal_boundary():
     # (assuming it's not in hp already)
     assert "Wintersemester 2024/25" in hp
 
-def test_exam_week_structure_and_buffers():
+def test_exam_week_structure_and_buffers() -> None:
+    """Test exam week structure and buffer rules for summer and winter semesters."""
     from calculate_exam_periods import calculate_stats, get_violations
 
     # SS structure: 3 weeks (P1, P2-HIP, P3)
@@ -186,7 +205,8 @@ def test_exam_week_structure_and_buffers():
     assert len(p_list_ws) == 4
     assert not get_violations(stats_ws, p_list_ws, True)
 
-def test_min_lecture_weeks():
+def test_min_lecture_weeks() -> None:
+    """Test violation detection when lecture weeks fall below the minimum threshold."""
     from calculate_exam_periods import calculate_stats, get_violations
     l_start = date(2024, 3, 18)
     l_end = date(2024, 6, 14) # Very short semester
@@ -196,18 +216,21 @@ def test_min_lecture_weeks():
     violations = get_violations(stats, p_list, False)
     assert any("Vorlesungswochen < 13" in v for v in violations)
 
-def test_easter_week_avoidance():
+def test_easter_week_avoidance() -> None:
+    """Test that Easter week is correctly identified to be avoided for exams."""
     from calculate_exam_periods import is_easter_week
     # Easter Sunday 2025 is April 20. Easter Monday is April 21.
     assert is_easter_week(date(2025, 4, 21)) is True
 
-def test_no_gap_rule_violation():
+def test_no_gap_rule_violation() -> None:
+    """Placeholder for gap rule violation test."""
     # Test optimizer gap check
     # (This is harder to test without running the full main loop,
     # but we can check the logic that adds the score)
     pass # Already verified by manual run and code review in previous steps
 
-def test_holiday_shift_freitag_vorher():
+def test_holiday_shift_freitag_vorher() -> None:
+    """Test that a holiday on Monday causes the exam day to shift to the preceding Friday."""
     # If a holiday is on Monday, it should take previous Friday
     nh = {date(2024, 5, 20): "Pfingstmontag"}
     monday = date(2024, 5, 20)
@@ -215,7 +238,8 @@ def test_holiday_shift_freitag_vorher():
     assert date(2024, 5, 17) in days # Previous Friday
     assert date(2024, 5, 20) not in days
 
-def test_ws2829_logic():
+def test_ws2829_logic() -> None:
+    """Test complex shift and overlap logic using Winter Semester 2028/29 as a case study."""
     from calculate_exam_periods import calculate_stats, get_exam_days
     l_start = date(2028, 9, 25)
     l_end = date(2029, 2, 9)
