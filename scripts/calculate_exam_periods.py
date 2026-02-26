@@ -1,7 +1,16 @@
+"""
+This script calculates and extrapolates exam periods for TH Köln.
+It scrapes lecture times and interdisciplinary project weeks (HIP) from the TH Köln website,
+calculates exam blocks based on certain rules (e.g., 2 blocks in winter, 1 in summer),
+and extrapolates these periods into the future (up to 4 years).
+The results are saved as Markdown, ICS, and PDF files.
+"""
+
 import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime, date, timedelta
+from typing import List, Dict, Tuple, Optional, Any, Set
 import holidays
 from dateutil import easter
 from icalendar import Calendar, Event as ICalEvent
@@ -16,7 +25,16 @@ from reportlab.platypus import Table, TableStyle
 VORLESUNGSZEITEN_URL = "https://www.th-koeln.de/studium/vorlesungszeiten_357.php"
 HIP_URL = "https://www.th-koeln.de/studium/interdisziplinaere-projektwoche_48320.php"
 
-def parse_date(date_str, default_year=None):
+def parse_date(date_str: str, default_year: Optional[int] = None) -> Optional[date]:
+    """Parses a date string into a date object.
+
+    Args:
+        date_str: The date string to parse (e.g., 'dd.mm.yyyy' or 'dd.mm.').
+        default_year: The year to use if the date string doesn't contain one.
+
+    Returns:
+        The parsed date object, or None if parsing fails.
+    """
     date_str = date_str.replace(' ', '').replace('\xa0', '')
     # Handle both - and –
     date_str = date_str.replace('–', '-')
@@ -35,7 +53,15 @@ def parse_date(date_str, default_year=None):
 
     return None
 
-def get_nrw_holidays(year):
+def get_nrw_holidays(year: int) -> holidays.HolidayBase:
+    """Gets public holidays for North Rhine-Westphalia (NRW) for a given year.
+
+    Args:
+        year: The year for which to retrieve holidays.
+
+    Returns:
+        A holiday object containing NRW holidays and Rosenmontag.
+    """
     nh = holidays.Germany(state='NW', years=[year, year+1])
     # Rosenmontag is 48 days before Easter Sunday
     for y in [year, year+1]:
@@ -44,20 +70,53 @@ def get_nrw_holidays(year):
         nh.update({rosenmontag: "Rosenmontag"})
     return nh
 
-def get_weiberfastnacht(year):
+def get_weiberfastnacht(year: int) -> date:
+    """Calculates the date of Weiberfastnacht for a given year.
+
+    Args:
+        year: The year for which to calculate.
+
+    Returns:
+        The date of Weiberfastnacht.
+    """
     easter_date = easter.easter(year)
     return easter_date - timedelta(days=52)
 
-def get_working_days_in_week(monday):
+def get_working_days_in_week(monday: date) -> List[date]:
+    """Gets a list of working days (Mon-Fri) for the week starting on the given Monday.
+
+    Args:
+        monday: The Monday of the week.
+
+    Returns:
+        A list of five date objects (Monday to Friday).
+    """
     return [monday + timedelta(days=i) for i in range(5)]
 
-def is_easter_week(monday):
+def is_easter_week(monday: date) -> bool:
+    """Checks if the week starting on the given Monday is the Easter week (containing Easter Monday).
+
+    Args:
+        monday: The Monday of the week to check.
+
+    Returns:
+        True if it is Easter week, False otherwise.
+    """
     # Week in which Easter Monday lies
     easter_monday = easter.easter(monday.year) + timedelta(days=1)
     em_monday = easter_monday - timedelta(days=easter_monday.weekday())
     return monday == em_monday
 
-def get_ws_holiday_weeks(p1_mon, p3_mon):
+def get_ws_holiday_weeks(p1_mon: date, p3_mon: date) -> int:
+    """Counts the number of holiday weeks (Christmas/New Year) between two dates in a winter semester.
+
+    Args:
+        p1_mon: The start date (typically the first exam block).
+        p3_mon: The end date (typically the last exam block).
+
+    Returns:
+        The number of holiday weeks found.
+    """
     holiday_weeks = 0
     current = p1_mon
     while current <= p3_mon:
@@ -69,7 +128,19 @@ def get_ws_holiday_weeks(p1_mon, p3_mon):
         current += timedelta(days=7)
     return holiday_weeks
 
-def get_exam_days(monday, nh, used_days=None):
+def get_exam_days(monday: date, nh: holidays.HolidayBase, used_days: Optional[Set[date]] = None) -> Tuple[List[date], List[Tuple[date, str]]]:
+    """Determines the actual exam days for a given week, accounting for holidays and overlaps.
+
+    Args:
+        monday: The Monday of the week.
+        nh: Public holidays object.
+        used_days: Set of days already allocated to other exam blocks.
+
+    Returns:
+        A tuple containing:
+            - A list of actual exam dates.
+            - A list of holiday tuples (date, holiday name).
+    """
     if used_days is None:
         used_days = set()
     target_days = get_working_days_in_week(monday)
@@ -103,7 +174,19 @@ def get_exam_days(monday, nh, used_days=None):
     actual_exam_days.sort()
     return actual_exam_days, found_holidays
 
-def find_best_hip(l_start, l_end, is_winter, num_exams, nh):
+def find_best_hip(l_start: date, l_end: date, is_winter: bool, num_exams: int, nh: holidays.HolidayBase) -> Optional[date]:
+    """Finds the best HIP week candidate by scoring different buffer configurations.
+
+    Args:
+        l_start: Start of lecture period.
+        l_end: End of lecture period.
+        is_winter: Whether it's a winter semester.
+        num_exams: Number of exam weeks in the first block.
+        nh: Public holidays object.
+
+    Returns:
+        The Monday of the best HIP week candidate.
+    """
     best_hip = None
     best_score = 9999
 
@@ -131,7 +214,14 @@ def find_best_hip(l_start, l_end, is_winter, num_exams, nh):
 
     return best_hip
 
-def scrape_data():
+def scrape_data() -> Tuple[Dict[str, Tuple[date, date]], Dict[str, Tuple[date, date]]]:
+    """Scrapes lecture times and HIP weeks from the TH Köln website.
+
+    Returns:
+        A tuple containing:
+            - A dictionary of lecture periods {semester_name: (start_date, end_date)}.
+            - A dictionary of HIP periods {semester_name: (start_date, end_date)}.
+    """
     # Scrape lecture times
     resp = requests.get(VORLESUNGSZEITEN_URL, timeout=30)
     resp.raise_for_status()
@@ -194,13 +284,29 @@ def scrape_data():
 
     return lecture_periods, hip_periods
 
-def sem_key(sem_name):
+def sem_key(sem_name: str) -> Tuple[int, bool]:
+    """Generates a sortable key for semester names.
+
+    Args:
+        sem_name: The semester name (e.g., 'Wintersemester 2023/24').
+
+    Returns:
+        A tuple (year, is_winter) for sorting.
+    """
     year_match = re.search(r'\d{4}', sem_name)
     year = int(year_match.group()) if year_match else 0
     is_winter = 'Winter' in sem_name
     return (year, is_winter)
 
-def extrapolate_periods(lecture_periods, hip_periods, proposal_boundary, num_years=4):
+def extrapolate_periods(lecture_periods: Dict[str, Tuple[date, date]], hip_periods: Dict[str, Tuple[date, date]], proposal_boundary: Tuple[int, bool], num_years: int = 4) -> None:
+    """Extrapolates lecture and HIP periods into the future.
+
+    Args:
+        lecture_periods: Dictionary of known lecture periods (updated in-place).
+        hip_periods: Dictionary of known HIP periods (updated in-place).
+        proposal_boundary: The last (year, is_winter) semester that was actually scraped.
+        num_years: How many years to extrapolate.
+    """
     # Ensure all semesters in lecture_periods have HIP periods
     for sem_name in lecture_periods:
         if sem_name not in hip_periods:
@@ -267,7 +373,19 @@ def extrapolate_periods(lecture_periods, hip_periods, proposal_boundary, num_yea
 
             hip_periods[sem_name] = (hip_mon, hip_mon + timedelta(days=4))
 
-def calculate_stats(p_list, is_winter, l_start, l_end, nh):
+def calculate_stats(p_list: List[date], is_winter: bool, l_start: date, l_end: date, nh: holidays.HolidayBase) -> Dict[str, int]:
+    """Calculates statistics for a given semester schedule.
+
+    Args:
+        p_list: List of Mondays of exam/HIP weeks.
+        is_winter: Whether it's a winter semester.
+        l_start: Start of lecture period.
+        l_end: End of lecture period.
+        nh: Public holidays object.
+
+    Returns:
+        A dictionary containing 'lecture_weeks', 'w_before', and 'w_after'.
+    """
     # Determine all actual exam days for this candidate
     # Process in reverse order to correctly account for shifts/overlaps
     p_days_map = {}
@@ -278,7 +396,15 @@ def calculate_stats(p_list, is_winter, l_start, l_end, nh):
         used_days.update(days)
     all_exam_days = used_days
 
-    def is_full_lecture_week(monday):
+    def is_full_lecture_week(monday: date) -> bool:
+        """Checks if a week is a full lecture week.
+
+        Args:
+            monday: The Monday of the week to check.
+
+        Returns:
+            True if it's a full lecture week, False otherwise.
+        """
         week_days = [monday + timedelta(days=i) for i in range(5)]
         # No exam days in the week
         if any(d in all_exam_days for d in week_days): return False
@@ -333,7 +459,17 @@ def calculate_stats(p_list, is_winter, l_start, l_end, nh):
         'w_after': w_after
     }
 
-def get_violations(stats, p_list, is_winter):
+def get_violations(stats: Dict[str, int], p_list: List[date], is_winter: bool) -> List[str]:
+    """Identifies rule violations in a given schedule.
+
+    Args:
+        stats: Statistics calculated by `calculate_stats`.
+        p_list: List of Mondays of exam/HIP weeks.
+        is_winter: Whether it's a winter semester.
+
+    Returns:
+        A list of strings describing any violations.
+    """
     v = []
     if stats['lecture_weeks'] < 13: v.append(f"Vorlesungswochen < 13 ({stats['lecture_weeks']})")
     if stats['w_before'] < 7: v.append(f"Wochen vor HIP < 7 ({stats['w_before']})")
@@ -341,7 +477,13 @@ def get_violations(stats, p_list, is_winter):
     if any(is_easter_week(m) for m in p_list): v.append("Prüfung in Osterwoche")
     return v
 
-def generate_pdf(all_semester_results, proposal_boundary):
+def generate_pdf(all_semester_results: Dict[str, Any], proposal_boundary: Tuple[int, bool]) -> None:
+    """Generates a visual PDF timeline for the calculated exam periods.
+
+    Args:
+        all_semester_results: Dictionary containing all calculation results per semester.
+        proposal_boundary: The boundary after which results are considered proposals.
+    """
     os.makedirs('files', exist_ok=True)
     c = canvas.Canvas("files/exam_periods.pdf", pagesize=landscape(A4))
     width, height = landscape(A4)
@@ -462,7 +604,9 @@ def generate_pdf(all_semester_results, proposal_boundary):
         c.showPage()
     c.save()
 
-def main():
+def main() -> None:
+    """Main execution function for calculating and generating exam period files.
+    """
     try:
         lecture_periods, hip_periods = scrape_data()
     except Exception as e:

@@ -1,8 +1,16 @@
+"""
+This script scrapes and parses TH Köln appointments (Campus-Termine and Prüfungszeiten) from PDFs.
+It finds PDF links on the TH Köln website, downloads them, and extracts events using
+docling (for Campus-Termine) and pdfplumber (for Prüfungszeiten).
+The extracted events are saved into an ICS (iCalendar) file.
+"""
+
 import os
 import re
 import sys
 import requests
 from datetime import datetime, timedelta
+from typing import Dict, Optional, Any
 from docling.document_converter import DocumentConverter
 from icalendar import Calendar, Event
 import pandas as pd
@@ -13,7 +21,12 @@ import pdfplumber
 BASE_URL = "https://www.th-koeln.de/informatik-und-ingenieurwissenschaften/informatik-und-ingenieurwissenschaften/termine-und-fristen_19440.php"
 TH_MAM_BASE = "https://www.th-koeln.de"
 
-def scrape_pdf_links():
+def scrape_pdf_links() -> Dict[str, Optional[str]]:
+    """Scrapes the TH Köln website for Campus-Termine and Prüfungszeiten PDF links.
+
+    Returns:
+        A dictionary containing keys 'campus' and 'pruefungszeiten' with their respective URLs.
+    """
     print(f"Scraping {BASE_URL} for PDF links...")
     links = {
         'campus': None,
@@ -47,7 +60,16 @@ def scrape_pdf_links():
         print(f"Error scraping links: {e}")
         return links
 
-def parse_campus_appointments(pdf_url, cal):
+def parse_campus_appointments(pdf_url: str, cal: Calendar) -> int:
+    """Parses Campus-Termine from a PDF URL and adds events to the provided calendar.
+
+    Args:
+        pdf_url: The URL of the Campus-Termine PDF.
+        cal: The iCalendar object to add events to.
+
+    Returns:
+        The number of events successfully parsed and added.
+    """
     print(f"Parsing Campus-Termine from {pdf_url}...")
     try:
         response = requests.get(pdf_url, timeout=30)
@@ -121,7 +143,16 @@ def parse_campus_appointments(pdf_url, cal):
         print(f"Error parsing campus appointments: {e}")
         return 0
 
-def is_strikethrough(page, table_cell):
+def is_strikethrough(page: Any, table_cell: Any) -> bool:
+    """Checks if a table cell in a PDF page has a strikethrough line.
+
+    Args:
+        page: The pdfplumber page object.
+        table_cell: The table cell object (with bbox).
+
+    Returns:
+        True if a strikethrough is detected, False otherwise.
+    """
     if not table_cell: return False
     x0, y0, x1, y1 = table_cell
     # Strikethrough is a horizontal line in the middle of the cell
@@ -140,7 +171,16 @@ def is_strikethrough(page, table_cell):
                         return True
     return False
 
-def parse_pruefungszeiten(pdf_url, cal):
+def parse_pruefungszeiten(pdf_url: str, cal: Calendar) -> int:
+    """Parses Prüfungszeiten from a PDF URL and adds events to the provided calendar.
+
+    Args:
+        pdf_url: The URL of the Prüfungszeiten PDF.
+        cal: The iCalendar object to add events to.
+
+    Returns:
+        The number of events successfully parsed and added.
+    """
     print(f"Parsing Prüfungszeiten from {pdf_url}...")
     try:
         response = requests.get(pdf_url, timeout=30)
@@ -211,7 +251,9 @@ def parse_pruefungszeiten(pdf_url, cal):
         print(f"Error parsing Prüfungszeiten: {e}")
         return 0
 
-if __name__ == "__main__":
+def main() -> None:
+    """Main execution function for parsing TH Köln appointments and generating an ICS file.
+    """
     parser = argparse.ArgumentParser(description='Parse TH Köln appointments to ICS.')
     parser.add_argument('--output', type=str, default='files/f10_appointments.ics', help='Output ICS file path')
     args = parser.parse_args()
@@ -244,3 +286,6 @@ if __name__ == "__main__":
     else:
         print("No events found. This might indicate a scraping or parsing failure.")
         sys.exit(1)
+
+if __name__ == "__main__":
+    main()
