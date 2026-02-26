@@ -1,3 +1,9 @@
+"""Unit tests for the CV Markdown to JSON conversion script.
+
+This module contains tests for parsing Markdown-formatted CVs and converting
+them into a JSON structure suitable for the website.
+"""
+
 import sys
 import os
 import json
@@ -15,7 +21,8 @@ from cv_markdown_to_json import (
     parse_skills
 )
 
-def test_parse_markdown_cv():
+def test_parse_markdown_cv() -> None:
+    """Test parsing of a Markdown CV file into sections."""
     md_content = """---
 layout: archive
 title: "CV"
@@ -36,7 +43,8 @@ Work experience
         assert "B.Sc. in CS, TH Köln, 2020" in sections["Education"]
         assert "Dev, Tech Corp, 2021-present" in sections["Work experience"]
 
-def test_extract_author_info():
+def test_extract_author_info() -> None:
+    """Test extraction of author information from a configuration dictionary."""
     config = {
         "name": "John Doe",
         "url": "https://example.com",
@@ -54,7 +62,8 @@ def test_extract_author_info():
     assert info["summary"] == "Software Engineer"
     assert any(p["network"] == "GitHub" and p["username"] == "johndoe" for p in info["profiles"])
 
-def test_parse_education():
+def test_parse_education() -> None:
+    """Test parsing of education entries from a text string."""
     text = "* B.Sc. in Computer Science, TH Köln, 2020, GPA: 1.3"
     edu = parse_education(text)
     assert len(edu) == 1
@@ -63,7 +72,8 @@ def test_parse_education():
     assert edu[0]["endDate"] == "2020"
     assert edu[0]["gpa"] == "1.3"
 
-def test_parse_work_experience():
+def test_parse_work_experience() -> None:
+    """Test parsing of work experience entries including highlights from a text string."""
     text = """* Software Engineer, Tech Corp, 2021 - present
     * Developed awesome features
     - Fixed many bugs"""
@@ -76,7 +86,8 @@ def test_parse_work_experience():
     assert "Developed awesome features" in work[0]["highlights"]
     assert "Fixed many bugs" in work[0]["highlights"]
 
-def test_parse_skills():
+def test_parse_skills() -> None:
+    """Test parsing of skills and keywords from a text string."""
     text = "Languages: Python, JavaScript, Java\nTools: Docker, Git"
     skills = parse_skills(text)
     assert len(skills) == 2
