@@ -25,44 +25,8 @@ from reportlab.platypus import Table, TableStyle
 VORLESUNGSZEITEN_URL = "https://www.th-koeln.de/studium/vorlesungszeiten_357.php"
 HIP_URL = "https://www.th-koeln.de/studium/interdisziplinaere-projektwoche_48320.php"
 
-# School holidays NRW
-SCHOOL_HOLIDAYS = {
-    2024: {
-        "Ostern": (date(2024, 3, 25), date(2024, 4, 6)),
-        "Sommer": (date(2024, 7, 8), date(2024, 8, 20)),
-        "Herbst": (date(2024, 10, 14), date(2024, 10, 26)),
-    },
-    2025: {
-        "Ostern": (date(2025, 4, 14), date(2025, 4, 26)),
-        "Sommer": (date(2025, 7, 14), date(2025, 8, 26)),
-        "Herbst": (date(2025, 10, 13), date(2025, 10, 25)),
-    },
-    2026: {
-        "Ostern": (date(2026, 3, 30), date(2026, 4, 11)),
-        "Sommer": (date(2026, 7, 20), date(2026, 9, 1)),
-        "Herbst": (date(2026, 10, 17), date(2026, 10, 31)),
-    },
-    2027: {
-        "Ostern": (date(2027, 3, 22), date(2027, 4, 3)),
-        "Sommer": (date(2027, 7, 19), date(2027, 8, 31)),
-        "Herbst": (date(2027, 10, 23), date(2027, 11, 6)),
-    },
-    2028: {
-        "Ostern": (date(2028, 4, 10), date(2028, 4, 22)),
-        "Sommer": (date(2028, 7, 10), date(2028, 8, 22)),
-        "Herbst": (date(2028, 10, 23), date(2028, 11, 4)),
-    },
-    2029: {
-        "Ostern": (date(2029, 3, 26), date(2029, 4, 7)),
-        "Sommer": (date(2029, 7, 2), date(2029, 8, 14)),
-        "Herbst": (date(2029, 10, 15), date(2029, 10, 27)),
-    },
-    2030: {
-        "Ostern": (date(2030, 4, 15), date(2030, 4, 27)),
-        "Sommer": (date(2030, 6, 24), date(2030, 8, 6)),
-        "Herbst": (date(2030, 10, 14), date(2030, 10, 26)),
-    }
-}
+# URL for school holidays
+SCHOOL_HOLIDAYS_URL = "https://www.schulferien.org/deutschland/ferien/nordrhein-westfalen/"
 
 def parse_date(date_str: str, default_year: Optional[int] = None) -> Optional[date]:
     """Parses a date string into a date object.
@@ -256,6 +220,56 @@ def find_best_hip(l_start: date, l_end: date, is_winter: bool, num_exams: int, n
             best_hip = hip_mon_cand
 
     return best_hip
+
+def scrape_school_holidays() -> Dict[int, Dict[str, Tuple[date, date]]]:
+    """Scrapes school holiday dates from schulferien.org.
+
+    Returns:
+        A dictionary mapping years to holiday types and their date ranges.
+    """
+    resp = requests.get(SCHOOL_HOLIDAYS_URL, timeout=30)
+    resp.raise_for_status()
+    soup = BeautifulSoup(resp.text, 'html.parser')
+
+    school_holidays = {}
+    table = soup.find('table', class_='sf_table')
+    if not table:
+        return {}
+
+    rows = table.find('tbody').find_all('tr')
+    for row in rows:
+        cells = row.find_all('td')
+        if not cells:
+            continue
+
+        year_text = cells[0].get_text(strip=True)
+        # Extract 4-digit year, handle potential footnotes
+        year_match = re.search(r'\d{4}', year_text)
+        if not year_match:
+            continue
+        year = int(year_match.group())
+
+        school_holidays[year] = {}
+        for idx, h_type in enumerate(["Winter", "Ostern", "Pfingsten", "Sommer", "Herbst", "Weihnachten"]):
+            # Offset by 1 because first cell is year
+            cell = cells[idx + 1]
+            dates_text = cell.get_text(strip=True)
+            if dates_text == '-':
+                continue
+
+            parts = re.split(r'[–-]|bis', dates_text)
+            if len(parts) >= 2:
+                end = parse_date(parts[1].strip(), default_year=year)
+                start = parse_date(parts[0].strip(), default_year=end.year if end else year)
+                if start and end:
+                    school_holidays[year][h_type] = (start, end)
+            elif len(parts) == 1:
+                # Single day holiday
+                d = parse_date(parts[0].strip(), default_year=year)
+                if d:
+                    school_holidays[year][h_type] = (d, d)
+
+    return school_holidays
 
 def scrape_data() -> Tuple[Dict[str, Tuple[date, date]], Dict[str, Tuple[date, date]]]:
     """Scrapes lecture times and HIP weeks from the TH Köln website.
@@ -520,12 +534,13 @@ def get_violations(stats: Dict[str, int], p_list: List[date], is_winter: bool) -
     if any(is_easter_week(m) for m in p_list): v.append("Prüfung in Osterwoche")
     return v
 
-def generate_pdf(all_semester_results: Dict[str, Any], proposal_boundary: Tuple[int, bool]) -> None:
+def generate_pdf(all_semester_results: Dict[str, Any], proposal_boundary: Tuple[int, bool], school_holidays: Dict[int, Dict[str, Tuple[date, date]]]) -> None:
     """Generates a visual PDF timeline for the calculated exam periods.
 
     Args:
         all_semester_results: Dictionary containing all calculation results per semester.
         proposal_boundary: The boundary after which results are considered proposals.
+        school_holidays: Dictionary mapping years to holiday types and their date ranges.
     """
     os.makedirs('files', exist_ok=True)
     c = canvas.Canvas("files/exam_periods.pdf", pagesize=landscape(A4))
@@ -659,8 +674,8 @@ def generate_pdf(all_semester_results: Dict[str, Any], proposal_boundary: Tuple[
             hol_types = ["Ostern", "Sommer"]
 
         for ht in hol_types:
-            if current_year in SCHOOL_HOLIDAYS and ht in SCHOOL_HOLIDAYS[current_year]:
-                s, e = SCHOOL_HOLIDAYS[current_year][ht]
+            if current_year in school_holidays and ht in school_holidays[current_year]:
+                s, e = school_holidays[current_year][ht]
                 c.drawString(70, y_pos, f"{ht}: {s.strftime('%d.%m.%Y')} - {e.strftime('%d.%m.%Y')}")
                 y_pos -= 15
 
@@ -692,6 +707,7 @@ def main() -> None:
     """
     try:
         lecture_periods, hip_periods = scrape_data()
+        school_holidays = scrape_school_holidays()
     except Exception as e:
         print(f"Error scraping data: {e}")
         sys.exit(1)
@@ -841,7 +857,7 @@ def main() -> None:
 
     with open('files/exam_periods.md', 'w', encoding='utf-8') as f: f.write(output_md)
     with open('files/exam_periods.ics', 'wb') as f: f.write(cal.to_ical())
-    generate_pdf(all_semester_results, proposal_boundary)
+    generate_pdf(all_semester_results, proposal_boundary, school_holidays)
     print("Files generated: files/exam_periods.md, files/exam_periods.ics, files/exam_periods.pdf")
 
 if __name__ == "__main__":
