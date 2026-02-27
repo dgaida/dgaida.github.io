@@ -25,6 +25,45 @@ from reportlab.platypus import Table, TableStyle
 VORLESUNGSZEITEN_URL = "https://www.th-koeln.de/studium/vorlesungszeiten_357.php"
 HIP_URL = "https://www.th-koeln.de/studium/interdisziplinaere-projektwoche_48320.php"
 
+# School holidays NRW
+SCHOOL_HOLIDAYS = {
+    2024: {
+        "Ostern": (date(2024, 3, 25), date(2024, 4, 6)),
+        "Sommer": (date(2024, 7, 8), date(2024, 8, 20)),
+        "Herbst": (date(2024, 10, 14), date(2024, 10, 26)),
+    },
+    2025: {
+        "Ostern": (date(2025, 4, 14), date(2025, 4, 26)),
+        "Sommer": (date(2025, 7, 14), date(2025, 8, 26)),
+        "Herbst": (date(2025, 10, 13), date(2025, 10, 25)),
+    },
+    2026: {
+        "Ostern": (date(2026, 3, 30), date(2026, 4, 11)),
+        "Sommer": (date(2026, 7, 20), date(2026, 9, 1)),
+        "Herbst": (date(2026, 10, 17), date(2026, 10, 31)),
+    },
+    2027: {
+        "Ostern": (date(2027, 3, 22), date(2027, 4, 3)),
+        "Sommer": (date(2027, 7, 19), date(2027, 8, 31)),
+        "Herbst": (date(2027, 10, 23), date(2027, 11, 6)),
+    },
+    2028: {
+        "Ostern": (date(2028, 4, 10), date(2028, 4, 22)),
+        "Sommer": (date(2028, 7, 10), date(2028, 8, 22)),
+        "Herbst": (date(2028, 10, 23), date(2028, 11, 4)),
+    },
+    2029: {
+        "Ostern": (date(2029, 3, 26), date(2029, 4, 7)),
+        "Sommer": (date(2029, 7, 2), date(2029, 8, 14)),
+        "Herbst": (date(2029, 10, 15), date(2029, 10, 27)),
+    },
+    2030: {
+        "Ostern": (date(2030, 4, 15), date(2030, 4, 27)),
+        "Sommer": (date(2030, 6, 24), date(2030, 8, 6)),
+        "Herbst": (date(2030, 10, 14), date(2030, 10, 26)),
+    }
+}
+
 def parse_date(date_str: str, default_year: Optional[int] = None) -> Optional[date]:
     """Parses a date string into a date object.
 
@@ -68,6 +107,10 @@ def get_nrw_holidays(year: int) -> holidays.HolidayBase:
         easter_date = easter.easter(y)
         rosenmontag = easter_date - timedelta(days=48)
         nh.update({rosenmontag: "Rosenmontag"})
+        # Add 24.12. and 31.12. if they fall on a weekday
+        for d in [date(y, 12, 24), date(y, 12, 31)]:
+            if d.weekday() < 5:
+                nh.update({d: "Heiligabend" if d.day == 24 else "Silvester"})
     return nh
 
 def get_weiberfastnacht(year: int) -> date:
@@ -600,6 +643,46 @@ def generate_pdf(all_semester_results: Dict[str, Any], proposal_boundary: Tuple[
         ]))
         w_t, h_t = t.wrapOn(c, width, height)
         t.drawOn(c, 50, y_pos - h_t)
+        y_pos -= h_t + 20
+
+        # NRW School Holidays
+        is_ws = 'Winter' in sem_name
+        current_year = l_start.year
+        c.setFont("Helvetica-Bold", 10)
+        c.drawString(50, y_pos, "Ferientermine NRW:")
+        c.setFont("Helvetica", 10)
+        y_pos -= 15
+
+        if is_ws:
+            hol_types = ["Herbst"]
+        else:
+            hol_types = ["Ostern", "Sommer"]
+
+        for ht in hol_types:
+            if current_year in SCHOOL_HOLIDAYS and ht in SCHOOL_HOLIDAYS[current_year]:
+                s, e = SCHOOL_HOLIDAYS[current_year][ht]
+                c.drawString(70, y_pos, f"{ht}: {s.strftime('%d.%m.%Y')} - {e.strftime('%d.%m.%Y')}")
+                y_pos -= 15
+
+        # Public Holidays during the week
+        y_pos -= 5
+        c.setFont("Helvetica-Bold", 10)
+        c.drawString(50, y_pos, "Feiertage (unter der Woche):")
+        c.setFont("Helvetica", 10)
+        y_pos -= 15
+
+        relevant_hols = []
+        curr = v_start
+        while curr <= v_end:
+            if curr.weekday() < 5 and curr in nh:
+                relevant_hols.append((curr, nh[curr]))
+            curr += timedelta(days=1)
+
+        # Sort and unique
+        relevant_hols = sorted(list(set(relevant_hols)))
+        for h_date, h_name in relevant_hols:
+            c.drawString(70, y_pos, f"{h_date.strftime('%d.%m.%Y')} ({h_name})")
+            y_pos -= 15
 
         c.showPage()
     c.save()
