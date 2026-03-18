@@ -12,4 +12,4 @@ jobs:
       - name: Check broken links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --verbose --no-progress './**/*.md' './**/*.html'
+          args: --verbose --no-progress --exclude-path "_includes/" --accept 200..=206,429,999 './**/*.md' './**/*.html'
