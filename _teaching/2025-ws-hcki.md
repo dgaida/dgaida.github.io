@@ -10,6 +10,8 @@ location: "Gummersbach, Germany"
 
 Mensch-zentrierte Künstliche Intelligenz im Bachelorstudiengang Medieninformatik.
 
+Modulbeschreibung: https://www.medieninformatik.th-koeln.de/mi-5.0/medieninformatik-bachelor/modulbeschreibungen-bpo5/BA_KI-HCKI/
+
 WS 26/27
 ======
 
