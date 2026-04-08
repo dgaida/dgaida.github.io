@@ -1,22 +1,17 @@
 var addressPoints = [
   [
-    "Talk 2 on Relevant Topic in Your Field<br />London School of Testing; London, UK",
-    51.4893335,
-    -0.14405508452768728
+    "Synergizing Language Models and Biogas Plant Control: A GPT-4 Approach<br />8th IWA World Conference on Anaerobic Digestion; Istanbul, Turkey",
+    41.006381,
+    28.9758715
   ],
   [
-    "Tutorial 1 on Relevant Topic in Your Field<br />UC-Berkeley Institute for Testing Science; Berkeley, CA, USA",
-    37.8708393,
-    -122.272863
+    "Entwicklung intelligenter autonomer Assistenten<br />Konrad-Adenauer-Stiftung: 22. Fachschaftstreffen MINT - Zukunft gestalten durch KI; Dresden, Germany",
+    51.0493286,
+    13.7381437
   ],
   [
-    "Conference Proceeding talk 3 on Relevant Topic in Your Field<br />Testing Institute of America 2014 Annual Conference; Los Angeles, CA, USA",
-    34.0536909,
-    -118.242766
-  ],
-  [
-    "Talk 1 on Relevant Topic in Your Field<br />UC San Francisco, Department of Testing; San Francisco, CA, USA",
-    37.7792588,
-    -122.4193286
+    "Natural-Language Robot Manipulation via MCP: An Integrated Framework for Vision-Guided Pick-and-Place Automation<br />9th Machine Learning for Cyber Physical Systems (ML4CPS) Conference; Berlin, Germany",
+    52.5173885,
+    13.3951309
   ]
 ];

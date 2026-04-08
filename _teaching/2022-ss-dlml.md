@@ -14,5 +14,3 @@ SoSe 26/27
 ======
 
 [Vorlesungsunterlagen, Termine, ...](https://dgaida.github.io/wpf_dlml_th_public/)
-
-[Diskussionsforum und Fragen](discord)
