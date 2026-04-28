@@ -23,7 +23,6 @@ Work experience
   * Projektleitung und -akquise im Bereich KI
   * Aufbau und Leitung der 7-köpfigen KI Forschungsgruppe
 * Wissenschaftlicher Mitarbeiter, Hahn-Schickard, 2016 - 2018
-* Consultant, Trojan Technologies, 2016 - 2016
 * Postdoc Position, University of Western Ontario / Trojan Technologies, 2016 - 2016
 * Wissenschaftlicher Mitarbeiter, TH Köln, 2009 - 2016
 
