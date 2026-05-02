@@ -41,7 +41,7 @@ jobs:
           fi
       - name: Send mail
         if: steps.commit_step.outputs.changed == 'true' && env.MAIL_SERVER != ''
-        uses: dawidd6/action-send-mail@v4
+        uses: dawidd6/action-send-mail@v17
         with:
           # Use the environment variable for server_address
           server_address: ${{ env.MAIL_SERVER }}
