@@ -1,5 +1,10 @@
 name: Check Links
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/check_links.yml
   schedule:
     - cron: '0 0 1 * *'  # Monatlich
   workflow_dispatch:
