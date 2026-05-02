@@ -1,5 +1,10 @@
 name: Check Links
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/check_links.yml
   schedule:
     - cron: '0 0 1 * *'  # Monatlich
   workflow_dispatch:
@@ -12,4 +17,4 @@ jobs:
       - name: Check broken links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --verbose --no-progress --root . --exclude-path "_includes/" --exclude-path "_layouts/" --exclude "\{\{.*\}\}" --exclude "https://scholar.google.de/.*" --exclude "https://www.researchgate.net/.*" --exclude "https://math.codidact.com/.*" --exclude "http://localhost:4000/.*" --accept 200..=206,429,999 './**/*.md' './**/*.html'
+          args: --verbose --no-progress --root-dir . --exclude-path "_includes/" --exclude-path "_layouts/" --exclude "\{\{.*\}\}" --exclude "https://scholar.google.de/.*" --exclude "https://www.researchgate.net/.*" --exclude "https://math.codidact.com/.*" --exclude "http://localhost:4000/.*" --accept 200..=206,429,999 './**/*.md' './**/*.html'
