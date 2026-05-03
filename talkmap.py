@@ -54,3 +54,7 @@ for file in g:
 # Save the map
 m = getorg.orgmap.create_map_obj()
 getorg.orgmap.output_html_cluster_map(location_dict, folder_name="talkmap", hashed_usernames=False)
+
+print(f"Success! Map data and HTML files have been updated in the 'talkmap/' directory.")
+print(f"- talkmap/org-locations.js (Data)")
+print(f"- talkmap/map.html (Map interface)")
