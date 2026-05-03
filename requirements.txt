@@ -3,3 +3,6 @@ git+https://github.com/dgaida/colloquium-protocol-creator.git
 pypdf
 docling
 groq
+getorg
+geopy
+python-frontmatter
