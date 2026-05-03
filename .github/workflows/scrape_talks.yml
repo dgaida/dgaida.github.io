@@ -6,6 +6,8 @@ on:
       - 'talks/**'
       - '_talks/**'
       - 'talkmap.ipynb'
+      - 'talkmap.py'
+      - '.github/workflows/scrape_talks.yml'
 
 jobs:
   build:
