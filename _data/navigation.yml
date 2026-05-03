@@ -14,6 +14,9 @@ main:
   - title: "Talks"
     url: /talks/    
 
+  - title: "Talk Map"
+    url: /talkmap.html
+
   - title: "Teaching"
     url: /teaching/    
     
