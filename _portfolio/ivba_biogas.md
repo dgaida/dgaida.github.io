@@ -4,6 +4,13 @@ excerpt: "Im Projekt entwickeln wir einen intelligenten, virtuellen Betriebsassi
 collection: portfolio
 ---
 
+| Info | Details |
+| :--- | :--- |
+| **Fördermittelgeber** | Bundesministerium für Landwirtschaft, Ernährung und Heimat (BMLEH) |
+| **Projektträger** | Fachagentur Nachwachsende Rohstoffe e.V. (FNR) |
+| **Laufzeit** | 01.01.2026 – 31.12.2028 (3 Jahre) |
+| **Projektpartner** | OEKOBIT GmbH, fuseki GmbH, TH Köln, NRW.Energy4Climate (assoziiert) |
+
 Das Ziel des Projekts „iVBA-Biogas“ ist die Entwicklung eines intelligenten, virtuellen Betriebsassistenten (iVBA), der eine bedarfsgerechte Regelung der Substratzufuhr in landwirtschaftlichen Biogasanlagen für die flexible Stromeinspeisung ermöglicht. Kern dieses Vorhabens ist die Nutzung eines multimodalen Large Language Modells, auch bekannt als Large Multimodal Modell (LMM), um den gesamten Anlagenbetrieb zu vereinfachen, die Betreiber zu entlasten und die Entwicklung der Regelung zu automatisieren. Diese Innovation führt zu einer deutlichen Effizienzsteigerung und Kostensenkung sowie einer nachhaltigeren Betriebsweise der Biogasanlagen und Entlastung der Betreiber. Zudem soll es (inter-)national Anwendung finden, wodurch es die Ziele des BMELs unterstützt, indem es zur Stabilisierung und Integration von Biogas in zukünftige Energiesysteme beiträgt und somit die Treibhausgasemissionen reduziert.
 Im Rahmen des Projekts wird ein modellbasierter prädiktiver Regler entwickelt, der auf Simulationen basierende Fütterungsvorschläge macht. Das dynamische Simulationsmodell erstellt das LMM automatisch aus einer textuellen Beschreibung und einer technischen Zeichnung der Biogasanlage. Der aktuelle Zustand der Biogasanlage wird durch KI-basierte Algorithmen als Wahrscheinlich-keitsverteilung geschätzt, was zu einer robusten Regelung führt. Der iVBA verfügt über eine benutzerfreundliche, sprachgesteuerte Oberfläche, die eine einfache und intuitive Kommunikation ermöglicht - vergleichbar mit ChatGPT. Biogasanlagenbetreiber können Fütterungsvorschläge diskutieren, Informationen über den Anlagenzustand abrufen oder den iVBA über Änderungen, wie z. B. neue Substrate, informieren. Die Validierung des iVBAs wird auf einer großtechnischen, landwirtschaftlichen Biogasanlage durchgeführt, um die praktische Anwendbarkeit und Effektivität des Systems zu testen.
 Das Verbundprojekt der OEKOBIT GmbH (Biogasanlagen-Hersteller- und -Planer), der fuseki GmbH (Softwareentwickler und KI-Experte) und der TH Köln (Forschung) wird durch den assoziierten Partner NRW.Energy4Climate bei Netzwerk- und Verwertungsaktivitäten unterstützt.
