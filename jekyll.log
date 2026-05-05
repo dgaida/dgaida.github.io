@@ -1,0 +1,62 @@
+Configuration file: /app/_config.yml
+To use retry middleware with Faraday v2.0+, install `faraday-retry` gem
+            Source: /app
+       Destination: /app/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating...
+       Jekyll Feed: Generating feed for posts
+                    done in 12.252 seconds.
+ Auto-regeneration: enabled for '/app'
+    Server address: http://0.0.0.0:3000/
+  Server running... press ctrl-c to stop.
+[2026-05-05 14:58:51] ERROR Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:15
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `eof?'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `run'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/server.rb:309:in `block in start_thread'
+      Regenerating: 1 file(s) changed at 2026-05-05 14:58:51
+                    jekyll.log
+       Jekyll Feed: Generating feed for posts
+[2026-05-05 14:58:51] ERROR Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:15
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `eof?'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `run'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/server.rb:309:in `block in start_thread'
+[2026-05-05 14:58:51] ERROR Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:16
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `eof?'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `run'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/server.rb:309:in `block in start_thread'
+[2026-05-05 14:58:51] ERROR Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:17
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `eof?'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `run'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/server.rb:309:in `block in start_thread'
+[2026-05-05 14:58:52] ERROR Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:17
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `eof?'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `run'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/server.rb:309:in `block in start_thread'
+[2026-05-05 14:58:52] ERROR Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:15
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `eof?'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `run'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/server.rb:309:in `block in start_thread'
+[2026-05-05 14:58:52] ERROR Errno::ECONNRESET: Connection reset by peer @ io_fillbuf - fd:16
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `eof?'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in `run'
+	/app/vendor/bundle/ruby/3.2.0/gems/webrick-1.9.2/lib/webrick/server.rb:309:in `block in start_thread'
+                    ...done in 13.599668718 seconds.
+
+      Regenerating: 1 file(s) changed at 2026-05-05 14:59:05
+                    jekyll.log
+       Jekyll Feed: Generating feed for posts
+                    ...done in 10.054779214 seconds.
+
+      Regenerating: 1 file(s) changed at 2026-05-05 14:59:15
+                    jekyll.log
+       Jekyll Feed: Generating feed for posts
+                    ...done in 9.952200972 seconds.
+
+      Regenerating: 1 file(s) changed at 2026-05-05 14:59:25
+                    jekyll.log
+       Jekyll Feed: Generating feed for posts
+                    ...done in 9.886208528 seconds.
+
+      Regenerating: 1 file(s) changed at 2026-05-05 14:59:35
+                    jekyll.log
+       Jekyll Feed: Generating feed for posts

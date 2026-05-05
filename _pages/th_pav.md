@@ -34,7 +34,7 @@ Informationen zum Prüfungsausschuss der Fakultät 10.
 
 <details style="cursor: pointer; margin-bottom: 10px;">
   <summary><strong>Wie erfolgt die Betreuung einer Bachelor-, Master- oder Projektarbeit?</strong></summary>
-  <p>Auf Wunsch biete ich alle zwei Wochen einen Zoom-Termin an. In diesem Rahmen können Sie über Ihren aktuellen Fortschritt berichten, offene Fragen klären und erhalten von mir konstruktives Feedback zu Ihrer Arbeit.</p>
+  <p>Auf Wunsch biete ich bei Bachelorarbeiten alle zwei Wochen und bei Masterthesen sowie Projektarbeiten (Praxisprojekt, WASP I, ...) alle vier Wochen einen Zoom-Termin an. In diesem Rahmen können Sie über Ihren aktuellen Fortschritt berichten, offene Fragen klären und erhalten von mir konstruktives Feedback zu Ihrer Arbeit.</p>
 </details>
 
 <details style="cursor: pointer; margin-bottom: 10px;">
@@ -45,7 +45,12 @@ Informationen zum Prüfungsausschuss der Fakultät 10.
 
 <details style="cursor: pointer; margin-bottom: 10px;">
   <summary><strong>Wie soll eine Projektarbeit (Praxisprojekt, WASP I, ...) dokumentiert werden?</strong></summary>
-  <p>Für Ihre Projektarbeit erstellen Sie bitte einen prägnanten schriftlichen Bericht. Die detaillierten Bewertungskriterien, an denen Sie sich orientieren können, finden Sie auf der Seite <a href="https://dgaida.github.io/student_projects/">Studentische Projekte</a>.</p>
+  <p>Für Ihre Projektarbeit erstellen Sie bitte einen prägnanten schriftlichen Bericht. Es handelt sich hierbei von der Prüfungsform her um eine Hausarbeit. Details zu dieser Prüfungsform finden Sie in der aktuellen Prüfungsordnung des Bachelorstudienganges Informatik der TH Köln. Die detaillierten Bewertungskriterien, an denen Sie sich orientieren können, finden Sie auf der Seite <a href="https://dgaida.github.io/student_projects/">Studentische Projekte</a>.</p>
+</details>
+
+<details style="cursor: pointer; margin-bottom: 10px;">
+  <summary><strong>Wie lange ist die Bearbeitungszeit für Bachelor-/Masterarbeiten und Projektarbeiten (Praxisprojekt, WASP I, ...)?</strong></summary>
+  <p>Die Bearbeitungszeiten für Bachelor-/Masterarbeiten sind in den entsprechenden Prüfungsordnungen definiert. Die Dauer eines Praxisprojekts wird ebenfalls über die aktuell gültige Prüfungsordnung festgelegt. Die Dauer des WASP I Projektteils (WASP = Wahlspezialisierung) richtet sich nach der Dauer eines Praxisprojekts.</p>
 </details>
 
 <details style="cursor: pointer; margin-bottom: 10px;">
