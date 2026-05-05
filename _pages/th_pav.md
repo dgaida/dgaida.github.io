@@ -47,3 +47,35 @@ Informationen zum Prüfungsausschuss der Fakultät 10.
   <summary><strong>Wie soll eine Projektarbeit (Praxisprojekt, WASP I, ...) dokumentiert werden?</strong></summary>
   <p>Für Ihre Projektarbeit erstellen Sie bitte einen prägnanten schriftlichen Bericht. Die detaillierten Bewertungskriterien, an denen Sie sich orientieren können, finden Sie auf der Seite <a href="https://dgaida.github.io/student_projects/">Studentische Projekte</a>.</p>
 </details>
+
+<details style="cursor: pointer; margin-bottom: 10px;">
+  <summary><strong>Wie wird der Kolloquiumsvortrag bewertet?</strong></summary>
+  <p>Die Bewertung des Kolloquiums stützt sich auf die inhaltliche Aufbereitung, die Art der Darstellung sowie Ihr Auftreten während des Vortrags und der anschließenden Diskussion.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Kriterium</th>
+        <th>Beschreibung</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Inhalt & Struktur</strong></td>
+        <td>Verständliche Darstellung von Ziel und Ergebnissen, fachliche Richtigkeit, roter Faden und Zeitmanagement.</td>
+      </tr>
+      <tr>
+        <td><strong>Visualisierung</strong></td>
+        <td>Übersichtliche und angemessene Gestaltung der Folien, die den Vortrag auch bei komplexen Inhalten unterstützen.</td>
+      </tr>
+      <tr>
+        <td><strong>Präsentation</strong></td>
+        <td>Sicherer, freier Vortrag sowie ein souveräner Umgang mit Fachfragen und eine kritische Reflexion der Arbeit.</td>
+      </tr>
+      <tr>
+        <td><strong>Demonstration</strong></td>
+        <td>Falls zutreffend: Vorführung der Ergebnisse (idealerweise live), um die technische Umsetzung zu verdeutlichen.</td>
+      </tr>
+    </tbody>
+  </table>
+</details>
