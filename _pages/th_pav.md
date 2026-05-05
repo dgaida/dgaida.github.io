@@ -29,3 +29,21 @@ Das Github Repository [**Academic Document Generator**](https://github.com/dgaid
 # Prüfungsausschuss
 
 Informationen zum Prüfungsausschuss der Fakultät 10.
+
+# FAQ
+
+<details style="cursor: pointer; margin-bottom: 10px;">
+  <summary><strong>Wie erfolgt die Betreuung einer Bachelor-, Master- oder Projektarbeit?</strong></summary>
+  <p>Auf Wunsch biete ich alle zwei Wochen einen Zoom-Termin an. In diesem Rahmen können Sie über Ihren aktuellen Fortschritt berichten, offene Fragen klären und erhalten von mir konstruktives Feedback zu Ihrer Arbeit.</p>
+</details>
+
+<details style="cursor: pointer; margin-bottom: 10px;">
+  <summary><strong>Wie erfolgt die Betreuung des Praxissemesters?</strong></summary>
+  <p>Zu Beginn Ihres Praxissemesters melden Sie sich bitte kurz bei mir. Während des Semesters freue ich mich über ein monatliches Update zum aktuellen Stand. Sollten Schwierigkeiten auftreten, können Sie mich selbstverständlich auch jederzeit zwischendurch kontaktieren.</p>
+  <p>Zum Abschluss verfassen Sie einen kurzen Bericht (ca. 5 Seiten), in dem Sie Ihre Tätigkeiten reflektieren, Ihren fachlichen und persönlichen Lernzuwachs beschreiben sowie eine Einschätzung zum Praxissemester und mögliche Verbesserungsvorschläge abgeben.</p>
+</details>
+
+<details style="cursor: pointer; margin-bottom: 10px;">
+  <summary><strong>Wie soll eine Projektarbeit (Praxisprojekt, WASP I, ...) dokumentiert werden?</strong></summary>
+  <p>Für Ihre Projektarbeit erstellen Sie bitte einen prägnanten schriftlichen Bericht. Die detaillierten Bewertungskriterien, an denen Sie sich orientieren können, finden Sie auf der Seite <a href="https://dgaida.github.io/student_projects/">Studentische Projekte</a>.</p>
+</details>
