@@ -18,81 +18,28 @@ End Enum
 Sub BatchConvertFolder()
     Dim folderPath As String
     Dim fileName As String
-    Dim pres As Presentation
-    Dim copyPath As String
-    Dim pdfPathNormal As String
-    Dim pdfPathAnim As String
 
-    ' Ordner w‰hlen
+    ' Ordner w√§hlen
     With Application.FileDialog(msoFileDialogFolderPicker)
-        .Title = "Ordner mit PPTX-Dateien w‰hlen"
+        .Title = "Ordner mit PPTX/PPTM-Dateien w√§hlen"
         If .Show <> -1 Then Exit Sub
-        folderPath = .SelectedItems(1) & "\"
+        folderPath = .SelectedItems(1) & "\\"
     End With
 
     Application.WindowState = ppWindowMinimized
     Application.DisplayAlerts = ppAlertsNone
 
+    ' Handle .pptx
     fileName = Dir(folderPath & "*.pptx")
-
     Do While fileName <> ""
-        ' Makrodatei selbst ¸berspringen
-        If LCase(fileName) <> "conversionmacros.pptm" Then
+        Call ProcessFile(folderPath & fileName)
+        fileName = Dir
+    Loop
 
-            Set pres = Presentations.Open( _
-                fileName:=folderPath & fileName, _
-                WithWindow:=msoFalse)
-
-            ' ---------- 1) Normales PDF ----------
-            pdfPathNormal = folderPath & Replace(fileName, ".pptx", ".pdf")
-            pres.ExportAsFixedFormat _
-                Path:=pdfPathNormal, _
-                FixedFormatType:=ppFixedFormatTypePDF, _
-                Intent:=ppFixedFormatIntentPrint, _
-                FrameSlides:=msoFalse, _
-                HandoutOrder:=ppPrintHandoutVerticalFirst, _
-                OutputType:=ppPrintOutputSlides, _
-                PrintHiddenSlides:=msoFalse, _
-                PrintRange:=Nothing, _
-                RangeType:=ppPrintAll, _
-                IncludeDocProperties:=True, _
-                KeepIRMSettings:=True, _
-                DocStructureTags:=True, _
-                BitmapMissingFonts:=True, _
-                UseISO19005_1:=False
-
-
-            ' ---------- 2) Kopie f¸r Animations-PDF ----------
-            copyPath = folderPath & Replace(fileName, ".pptx", "_anim.pptx")
-            pres.SaveCopyAs copyPath
-            pres.Close
-
-            ' Kopie ˆffnen
-            Set pres = Presentations.Open(copyPath, WithWindow:=msoFalse)
-            
-            If pres.Windows.Count > 0 Then
-                pres.Windows(1).Activate
-            Else
-                pres.NewWindow.Activate
-            End If
-            
-            ' versteckte Folien entfernen
-            Call DeleteHiddenSlides
-
-            ' Animations-PDF erzeugen
-            ' (dein vorhandenes Makro)
-            Call PrintToPDF
-
-            pres.Close
-            
-            ' If Dir(copyPath) <> "" Then
-                ' On Error Resume Next
-                ' Kill copyPath
-                ' On Error GoTo 0
-            ' End If
-
-        End If
-
+    ' Handle .pptm
+    fileName = Dir(folderPath & "*.pptm")
+    Do While fileName <> ""
+        Call ProcessFile(folderPath & fileName)
         fileName = Dir
     Loop
 
@@ -100,6 +47,115 @@ Sub BatchConvertFolder()
     Application.WindowState = ppWindowNormal
 
     MsgBox "Fertig.", vbInformation
+End Sub
+
+Sub BatchConvertSelectedFiles()
+    Dim i As Long
+    
+    ' Dateien w√§hlen
+    With Application.FileDialog(msoFileDialogFilePicker)
+        .Title = "PPTX/PPTM-Dateien w√§hlen"
+        .Filters.Clear
+        .Filters.Add "PowerPoint Presentations", "*.pptx; *.pptm"
+        .AllowMultiSelect = True
+        If .Show <> -1 Then Exit Sub
+        
+        Application.WindowState = ppWindowMinimized
+        Application.DisplayAlerts = ppAlertsNone
+        
+        For i = 1 To .SelectedItems.Count
+            Call ProcessFile(.SelectedItems(i))
+        Next i
+    End With
+
+    Application.DisplayAlerts = ppAlertsAll
+    Application.WindowState = ppWindowNormal
+
+    MsgBox "Fertig.", vbInformation
+End Sub
+
+Private Sub ProcessFile(ByVal filePath As String)
+    Dim pres As Presentation
+    Dim folderPath As String
+    Dim fileName As String
+    Dim dotPos As Integer
+    Dim baseName As String
+    Dim pdfPathNormal As String
+    Dim copyPath As String
+
+    ' Get folder and filename
+    dotPos = InStrRev(filePath, "\")
+    If dotPos <= 0 Then
+        dotPos = InStrRev(filePath, "/")
+    End If
+
+    If dotPos > 0 Then
+        folderPath = Left(filePath, dotPos)
+        fileName = Mid(filePath, dotPos + 1)
+    Else
+        folderPath = ""
+        fileName = filePath
+    End If
+    
+    ' Get base name
+    dotPos = InStrRev(fileName, ".")
+    If dotPos > 0 Then
+        baseName = Left(fileName, dotPos - 1)
+    Else
+        baseName = fileName
+    End If
+
+    ' Skip the macro file itself if it is in the list
+    If LCase(fileName) = "conversionmacros.pptm" Or LCase(fileName) = "presentationtopdfmacros.bas" Then Exit Sub
+
+    Set pres = Presentations.Open(fileName:=filePath, WithWindow:=msoFalse)
+
+    ' ---------- 1) Normales PDF ----------
+    pdfPathNormal = folderPath & baseName & ".pdf"
+    pres.ExportAsFixedFormat _
+        Path:=pdfPathNormal, _
+        FixedFormatType:=ppFixedFormatTypePDF, _
+        Intent:=ppFixedFormatIntentPrint, _
+        FrameSlides:=msoFalse, _
+        HandoutOrder:=ppPrintHandoutVerticalFirst, _
+        OutputType:=ppPrintOutputSlides, _
+        PrintHiddenSlides:=msoFalse, _
+        PrintRange:=Nothing, _
+        RangeType:=ppPrintAll, _
+        IncludeDocProperties:=True, _
+        KeepIRMSettings:=True, _
+        DocStructureTags:=True, _
+        BitmapMissingFonts:=True, _
+        UseISO19005_1:=False
+
+    ' ---------- 2) Kopie f√ºr Animations-PDF ----------
+    copyPath = folderPath & baseName & "_anim.pptx"
+    pres.SaveCopyAs copyPath
+    pres.Close
+
+    ' Kopie √∂ffnen
+    Set pres = Presentations.Open(copyPath, WithWindow:=msoFalse)
+    
+    If pres.Windows.Count > 0 Then
+        pres.Windows(1).Activate
+    Else
+        pres.NewWindow.Activate
+    End If
+    
+    ' versteckte Folien entfernen
+    Call DeleteHiddenSlides
+
+    ' Animations-PDF erzeugen
+    Call PrintToPDF
+
+    pres.Close
+    
+    ' Clean up the temporary anim pptx
+    If Dir(copyPath) <> "" Then
+        On Error Resume Next
+        Kill copyPath
+        On Error GoTo 0
+    End If
 End Sub
 
 Function DebugMode() As Boolean
@@ -561,7 +617,14 @@ End Sub
 Sub PrintTemporarySlides(oPresentation As Presentation)
 
     Dim pdfPath As String
-    pdfPath = Replace(oPresentation.FullName, ".pptx", "ated.pdf")
+    Dim dotPos As Integer
+    
+    dotPos = InStrRev(oPresentation.FullName, ".")
+    If dotPos > 0 Then
+        pdfPath = Left(oPresentation.FullName, dotPos - 1) & "ated.pdf"
+    Else
+        pdfPath = oPresentation.FullName & "ated.pdf"
+    End If
 
     oPresentation.ExportAsFixedFormat _
         Path:=pdfPath, _

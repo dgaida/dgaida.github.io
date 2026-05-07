@@ -28,8 +28,7 @@ python -m pytest tests/
 - Use `.md` extension for pages to ensure TOC and Markdown tables are processed correctly.
 - YouTube videos must be embedded using `https://www.youtube.com/embed/[VIDEO_ID]`.
 - TOC can be added with `{% include toc %}`.
-- **Action Versions**: Do not downgrade GitHub Action versions (e.g., keep `actions/checkout@v6` and `actions/setup-python@v6`).
 
 ## Development Guidelines
 
-- **Cleanup**: Always delete all temporary scripts, patches, or intermediate files created during development (e.g., .patch, temporary Python scripts for file editing) before submitting a pull request to keep the repository clean.
+- **Cleanup**: Always delete all temporary scripts, patches, or intermediate files created during development (e.g., `.patch`, temporary Python scripts for file editing) before submitting a pull request to keep the repository clean.
