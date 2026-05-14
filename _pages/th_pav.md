@@ -87,10 +87,10 @@ Informationen zum Prüfungsausschuss der Fakultät 10.
 
 <details style="cursor: pointer; margin-bottom: 10px;">
   <summary><strong>Wann findet das Kolloquium statt und wie läuft es ab?</strong></summary>
-  <p>Das Kolloquium findet innerhalb von sechs Wochen nach Abgabe der Abschlussarbeit statt. Das Kolloquium beginnt mit einem kurzen Vortrag von Ihnen zu Ihrer Arbeit. Dem schließt sich eine Fragerunde an. Die Dauer des Kolloquiums ist in der aktuell gültigen Prüfungsordnung geregelt.</p>
+  <p>Das Kolloquium findet in der Regel innerhalb von sechs Wochen nach der Abgabe der Abschlussarbeit statt. Es beginnt mit einem kurzen Vortrag Ihrerseits zu den Inhalten und Ergebnissen Ihrer Arbeit, woran sich eine Fragerunde anschließt. Die genaue Dauer des Kolloquiums ist in der für Sie gültigen Prüfungsordnung festgelegt.</p>
 </details>
 
 <details style="cursor: pointer; margin-bottom: 10px;">
-  <summary><strong>Wann sollte ich meine Abschlussarbeit spätestens anmelden wenn ich bis zum Ende des Semesters mein Studium beenden möchte?</strong></summary>
-  <p>Die Dauer der Abschlussarbeit ist in der Prüfungsordnung geregelt. Für Bachelorarbeiten ist eine Bearbeitungszeit von 9-12 Wochen üblich. Das Kolloquium findet innerhalb von 6 Wochen nach Abgabe Ihrer Abschlussarbeit statt. Beachten Sie, dass Sie bei Krankheit die Bearbeitungszeit Ihrer Arbeit um ein paar Wochen verlängern können. Sie sollten bei einer Bachelorarbeit deshalb mindestens 15-18 Wochen vor Ende des Semesters mit Ihrer Bachelorarbeit starten. Bei Masterthesen wesentlich früher wegen dem deutlich längeren Bearbeitungszeitraum, s. Prüfungsordnung.</p>
+  <summary><strong>Wann sollte ich meine Abschlussarbeit spätestens anmelden, wenn ich mein Studium bis zum Ende des Semesters beenden möchte?</strong></summary>
+  <p>Die Bearbeitungszeit Ihrer Abschlussarbeit ist in der Prüfungsordnung geregelt; für Bachelorarbeiten sind meist 9 bis 12 Wochen vorgesehen. Da das Kolloquium innerhalb von sechs Wochen nach der Abgabe stattfinden muss, sollten Sie bei einer Bachelorarbeit mindestens 15 bis 18 Wochen vor Semesterende mit der Arbeit beginnen. Dies berücksichtigt auch einen kleinen Puffer für eventuelle krankheitsbedingte Verlängerungen. Bei Masterthesen ist aufgrund des deutlich längeren Bearbeitungszeitraums ein entsprechend früherer Start erforderlich (siehe Prüfungsordnung).</p>
 </details>
