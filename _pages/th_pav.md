@@ -54,6 +54,11 @@ Informationen zum Prüfungsausschuss der Fakultät 10.
 </details>
 
 <details style="cursor: pointer; margin-bottom: 10px;">
+  <summary><strong>Welche Anforderungen gelten an eine gebundene Abschlussarbeit?</strong></summary>
+  <p>Eine Abschlussarbeit gilt als gebunden, wenn die Seiten dauerhaft zu einem Exemplar zusammengefügt sind und nicht ohne Weiteres ausgetauscht oder entfernt werden können. Übliche Beispiele sind Klebebindungen, Klammerbindungen oder Hardcover-Bindungen. Ringbindungen, Spiralbindungen oder Loseblattsammlungen erfüllen diese Anforderung nicht.</p>
+</details>
+
+<details style="cursor: pointer; margin-bottom: 10px;">
   <summary><strong>Wie wird der Kolloquiumsvortrag bewertet?</strong></summary>
   <p>Die Bewertung des Kolloquiums stützt sich auf die inhaltliche Aufbereitung, die Art der Darstellung sowie Ihr Auftreten während des Vortrags und der anschließenden Diskussion.</p>
 
