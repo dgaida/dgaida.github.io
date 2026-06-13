@@ -99,3 +99,8 @@ Informationen zum Prüfungsausschuss der Fakultät 10.
   <summary><strong>Wann sollte ich meine Abschlussarbeit spätestens anmelden, wenn ich mein Studium bis zum Ende des Semesters beenden möchte?</strong></summary>
   <p>Die Bearbeitungszeit Ihrer Abschlussarbeit ist in der Prüfungsordnung geregelt; für Bachelorarbeiten sind meist 9 bis 12 Wochen vorgesehen. Da das Kolloquium innerhalb von sechs Wochen nach der Abgabe stattfinden muss, sollten Sie bei einer Bachelorarbeit mindestens 16 bis 19 Wochen vor Semesterende mit der Arbeit beginnen. Dies berücksichtigt auch einen kleinen Puffer für eventuelle krankheitsbedingte Verlängerungen. Bei Masterthesen ist aufgrund des deutlich längeren Bearbeitungszeitraums ein entsprechend früherer Start erforderlich (siehe Prüfungsordnung).</p>
 </details>
+
+<details style="cursor: pointer; margin-bottom: 10px;">
+  <summary><strong>Wo kann ich sehen in welchem Prüfungszeitraum welche Prüfung angeboten wird?</strong></summary>
+  <p><a href="https://module.gm.th-koeln.de/exam-lists">https://module.gm.th-koeln.de/exam-lists</a> dort werden die Prüferlisten für jedes Semester veröffentlicht.</p>
+</details>
