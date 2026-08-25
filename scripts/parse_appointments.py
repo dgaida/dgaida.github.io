@@ -153,8 +153,9 @@ def is_strikethrough(page: Any, table_cell: Any) -> bool:
     Returns:
         True if a strikethrough is detected, False otherwise.
     """
-    if not table_cell: return False
-    x0, y0, x1, y1 = table_cell
+    if not table_cell or not isinstance(table_cell, (tuple, list)) or len(table_cell) < 4:
+        return False
+    x0, y0, x1, y1 = table_cell[:4]
     # Strikethrough is a horizontal line in the middle of the cell
     for line in page.lines:
         if abs(line['top'] - line['bottom']) < 2: # horizontal
@@ -204,8 +205,8 @@ def parse_pruefungszeiten(pdf_url: str, cal: Calendar) -> int:
                         sem = row_text[0]
                         if not sem: continue
 
-                        # Indices 3, 4 (Informatik) and 5, 6 (Ingenieurwissenschaften)
-                        for col_idx in [3, 4, 5, 6]:
+                        # Indices 2 (HIP-Woche), 3, 4 (Informatik) and 5, 6 (Ingenieurwissenschaften)
+                        for col_idx in [2, 3, 4, 5, 6]:
                             text = row_text[col_idx]
                             if not text or len(text.strip()) < 5: continue
 
@@ -232,8 +233,11 @@ def parse_pruefungszeiten(pdf_url: str, cal: Calendar) -> int:
                                     start_dt = datetime(y1, int(m1), int(d1))
                                     end_dt = datetime(y2, int(m2), int(d2)) + timedelta(days=1)
 
-                                    label = "Informatik" if col_idx in [3, 4] else "Ingenieurwissenschaften"
-                                    summary = f"Prüfungszeitraum {label} ({sem})"
+                                    if col_idx == 2:
+                                        summary = f"Prüfungswoche HIP ({sem})"
+                                    else:
+                                        label = "Informatik" if col_idx in [3, 4] else "Ingenieurwissenschaften"
+                                        summary = f"Prüfungszeitraum {label} ({sem})"
 
                                     event = Event()
                                     event.add('summary', summary)

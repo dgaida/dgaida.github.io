@@ -89,3 +89,43 @@ def test_parse_campus_appointments(mock_file: MagicMock, mock_converter_class: M
     assert str(events[0]['summary']) == "Meeting"
     assert str(events[0]['location']) == "Room 1"
     assert str(events[1]['summary']) == "All day event"
+
+@patch("parse_appointments.requests.get")
+@patch("parse_appointments.pdfplumber.open")
+@patch("builtins.open", new_callable=mock_open)
+def test_parse_pruefungszeiten(mock_file: MagicMock, mock_pdf_open: MagicMock, mock_get: MagicMock) -> None:
+    """Test parsing of exam periods including HIP exam weeks from a PDF into iCalendar."""
+    from parse_appointments import parse_pruefungszeiten
+    from icalendar import Calendar
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.content = b"PDF content"
+    mock_get.return_value = mock_resp
+
+    mock_pdf = MagicMock()
+    mock_pdf_open.return_value.__enter__.return_value = mock_pdf
+
+    mock_page = MagicMock()
+    mock_pdf.pages = [mock_page]
+    mock_page.lines = []
+
+    mock_table = MagicMock()
+    mock_page.find_tables.return_value = [mock_table]
+
+    # Row structure: Sem, Vorlesungszeiten, Prüfungen HIP-Woche, Informatik 1, Informatik 2, ING 1, ING 2
+    mock_table.extract.return_value = [
+        ["Sem.", "Vorlesungszeiten", "Prüfungen HIP-Woche", "Informatik", None, "Ingenieurwissenschaften", None],
+        [None, None, None, "Phase 1", "Phase 2", "Phase 1", "Phase 2"],
+        ["WS 26/27", "28.09.26 - 12.02.27", "16.11.26 - 20.11.26*", "14.09.26 - 25.09.2026 (1)", None, "01.02.27 - 12.02.27 (2)", None]
+    ]
+
+    cal = Calendar()
+    found = parse_pruefungszeiten("https://example.com/pruefung.pdf", cal)
+
+    assert found == 3
+    events = [c for c in cal.subcomponents if c.name == 'VEVENT']
+    summaries = [str(e['summary']) for e in events]
+    assert "Prüfungswoche HIP (WS 26/27)" in summaries
+    assert "Prüfungszeitraum Informatik (WS 26/27)" in summaries
+    assert "Prüfungszeitraum Ingenieurwissenschaften (WS 26/27)" in summaries
