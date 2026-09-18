@@ -30,6 +30,22 @@ Die Bewertung von Projekt- und Abschlussarbeiten erfolgt anhand der folgenden Kr
 | **Struktur, Sprache & Verständlichkeit** | Aufbau der Arbeit, Lesbarkeit, Klarheit der Darstellung, Fachsprache |
 | **Selbstständigkeit & Originalität** | Eigenanteil, kreative Ansätze, Initiative bei der Umsetzung |
 
+### Bewertungskriterien für das Kolloquium (Vortrag & Diskussion)
+
+Neben der schriftlichen Ausarbeitung wird auch der Vortrag im Kolloquium bewertet. Die folgenden Kriterien dienen als Orientierung für die Vorbereitung der Präsentation:
+
+| Kriterium | Beschreibung / Teilkriterien |
+| :--- | :--- |
+| **Inhaltliche Qualität & Struktur** | • Verständlichkeit von Ziel, Problemstellung und Ergebnissen<br>• Fachliche Richtigkeit<br>• Logischer Aufbau, klarer roter Faden, sinnvolle Schwerpunktsetzung<br>• **Einhaltung der Zeit (max. 15 Minuten)** |
+| **Darstellung & Visualisierung** | • Unterstützung des Vortrags durch Folien und Visualisierungen<br>• Übersichtlichkeit und Angemessenheit der Gestaltung<br>• Verständliche Vermittlung auch komplexer Inhalte |
+| **Präsentation & Auftreten** | • Freier, sicherer und verständlicher Vortrag (Sprache, Tempo, Körpersprache)<br>• Souveräner Umgang mit Fragen<br>• Kritische Reflexion der eigenen Arbeit (Stärken, Grenzen, Ausblick) |
+| **Demonstration (Demo)** | • **Praktische Vorführung der Ergebnisse** (sofern technisch möglich ist eine **Live-Demo** besonders gerne gesehen; alternativ Video) |
+| **Beantwortung von Fragen** | • Fachlich fundierte, präzise und strukturierte Antworten auf Fragen in der anschließenden Fragerunde |
+
+> **Wichtige Hinweise für die Vorbereitung:**
+> - **Zeitrahmen:** Der Vortrag darf **15 Minuten nicht überschreiten**. Bitte planen Sie Ihre Folien und Aufteilung entsprechend ein.
+> - **Live-Demo:** Eine Live-Demonstration des entwickelten Systems / der Software wird (falls möglich) ausdrücklich begrüßt.
+
 ## Abgeschlossene Arbeiten
 
 <details style="cursor: pointer; margin-bottom: 20px;">
