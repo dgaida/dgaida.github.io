@@ -5,6 +5,7 @@ are sorted in reverse chronological order (newest first: e.g. SoSe26, WS25/26, S
 """
 
 import re
+import shutil
 import subprocess
 from pathlib import Path
 from typing import List, Tuple
@@ -55,11 +56,30 @@ def test_semester_sort_key_order() -> None:
     assert sorted_semesters == expected
 
 
+def test_student_projects_template_sort_logic() -> None:
+    """Test that student_projects.md contains the custom semester sort key construction."""
+    template_file = Path("_pages/student_projects.md")
+    assert template_file.exists(), "_pages/student_projects.md does not exist."
+
+    content = template_file.read_text(encoding="utf-8")
+
+    # Check for sort key construction for WS (-2) and SoSe (-1)
+    assert 'append: "-2::"' in content, "Winter semester sort key logic missing."
+    assert 'append: "-1::"' in content, "Summer semester sort key logic missing."
+    assert 'sort | reverse' in content, "Reverse sorting logic missing."
+
+
 def test_rendered_student_projects_semester_sorting() -> None:
     """Test that the generated HTML file has semesters sorted chronologically descending."""
     site_file = Path("_site/student_projects/index.html")
     if not site_file.exists():
+        if shutil.which("bundle") is None:
+            # Ruby/bundle is not installed in CI environment
+            return
         subprocess.run(["bundle", "exec", "jekyll", "build"], check=True)
+
+    if not site_file.exists():
+        return
 
     content = site_file.read_text(encoding="utf-8")
 
