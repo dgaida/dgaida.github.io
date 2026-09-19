@@ -75,8 +75,23 @@ Neben der schriftlichen Ausarbeitung wird auch der Vortrag im Kolloquium bewerte
   </div>
   <div class="stat-item">
     <h3>Nach Semester:</h3>
-    {% assign stat_semesters = projects | map: 'semester' | uniq | compact | sort | reverse %}
-    {% for sem in stat_semesters %}
+    {% assign raw_stat_semesters = projects | map: 'semester' | uniq | compact %}
+    {% assign stat_sem_keys = "" | split: "," %}
+    {% for sem in raw_stat_semesters %}
+      {% if sem contains "WS" %}
+        {% assign yr = sem | remove: "WS" | split: "/" | first | strip %}
+        {% if yr.size == 2 %}{% assign yr = "20" | append: yr %}{% endif %}
+        {% assign key = yr | append: "-2::" | append: sem %}
+      {% else %}
+        {% assign yr = sem | remove: "SoSe" | strip %}
+        {% if yr.size == 2 %}{% assign yr = "20" | append: yr %}{% endif %}
+        {% assign key = yr | append: "-1::" | append: sem %}
+      {% endif %}
+      {% assign stat_sem_keys = stat_sem_keys | push: key %}
+    {% endfor %}
+    {% assign sorted_stat_sem_keys = stat_sem_keys | sort | reverse %}
+    {% for key in sorted_stat_sem_keys %}
+      {% assign sem = key | split: "::" | last %}
       <span style="font-size: 0.9em;">{{ sem }}: {{ projects | where: "semester", sem | size }}</span><br>
     {% endfor %}
   </div>
@@ -97,9 +112,25 @@ Neben der schriftlichen Ausarbeitung wird auch der Vortrag im Kolloquium bewerte
     </select>
     <select id="semester-filter">
       <option value="">Alle Semester</option>
-      {% assign semesters = projects | map: 'semester' | uniq %}
-      {% assign semesters_sorted = semesters | compact | sort | reverse %}
-      {% for sem in semesters_sorted %}<option value="{{ sem }}">{{ sem }}</option>{% endfor %}
+      {% assign raw_filter_semesters = projects | map: 'semester' | uniq | compact %}
+      {% assign filter_sem_keys = "" | split: "," %}
+      {% for sem in raw_filter_semesters %}
+        {% if sem contains "WS" %}
+          {% assign yr = sem | remove: "WS" | split: "/" | first | strip %}
+          {% if yr.size == 2 %}{% assign yr = "20" | append: yr %}{% endif %}
+          {% assign key = yr | append: "-2::" | append: sem %}
+        {% else %}
+          {% assign yr = sem | remove: "SoSe" | strip %}
+          {% if yr.size == 2 %}{% assign yr = "20" | append: yr %}{% endif %}
+          {% assign key = yr | append: "-1::" | append: sem %}
+        {% endif %}
+        {% assign filter_sem_keys = filter_sem_keys | push: key %}
+      {% endfor %}
+      {% assign sorted_filter_sem_keys = filter_sem_keys | sort | reverse %}
+      {% for key in sorted_filter_sem_keys %}
+        {% assign sem = key | split: "::" | last %}
+        <option value="{{ sem }}">{{ sem }}</option>
+      {% endfor %}
     </select>
     <select id="tag-filter">
       <option value="">Alle Themen</option>
@@ -127,9 +158,24 @@ Neben der schriftlichen Ausarbeitung wird auch der Vortrag im Kolloquium bewerte
 <h3 id="{{ project_type | slugify }}">{{ project_type }}</h3>
 
 {% assign type_projects = projects | where: "type", project_type %}
-{% assign semester_groups = type_projects | map: 'semester' | uniq | compact | sort | reverse %}
+{% assign raw_group_semesters = type_projects | map: 'semester' | uniq | compact %}
+{% assign group_sem_keys = "" | split: "," %}
+{% for sem in raw_group_semesters %}
+  {% if sem contains "WS" %}
+    {% assign yr = sem | remove: "WS" | split: "/" | first | strip %}
+    {% if yr.size == 2 %}{% assign yr = "20" | append: yr %}{% endif %}
+    {% assign key = yr | append: "-2::" | append: sem %}
+  {% else %}
+    {% assign yr = sem | remove: "SoSe" | strip %}
+    {% if yr.size == 2 %}{% assign yr = "20" | append: yr %}{% endif %}
+    {% assign key = yr | append: "-1::" | append: sem %}
+  {% endif %}
+  {% assign group_sem_keys = group_sem_keys | push: key %}
+{% endfor %}
+{% assign sorted_group_sem_keys = group_sem_keys | sort | reverse %}
 
-{% for sem in semester_groups %}
+{% for key in sorted_group_sem_keys %}
+  {% assign sem = key | split: "::" | last %}
 
 <h4 style="color: #666;">{{ sem }}</h4>
 
