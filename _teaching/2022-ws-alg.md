@@ -10,6 +10,10 @@ location: "Gummersbach, Germany"
 
 Algorithmik im Bachelorstudiengang Informatik.
 
+WS 26/27
+======
+Informationen zum aktuell im WS 26/27 gelehrten Kurs finden Sie auf der [Kurs-Webseite WS 26/27](https://dgaida.github.io/ba_algo_th_public/).
+
 Kursübersicht und Lernziele
 ======
 Das Modul Algorithmik vermittelt die Grundlagen des **Entwurfs und der Analyse effizienter Algorithmen** sowie die Auswahl geeigneter Datenstrukturen. Die Studierenden lernen, praktische Problemstellungen formal zu beschreiben, passende Speicherstrukturen auszuwählen und Algorithmen hinsichtlich ihrer **Laufzeit und ihres Speicherbedarfs** systematisch zu bewerten. Ein zentrales Ziel ist es, komplexe Probleme mit minimalem Ressourcenverbrauch zu lösen.
